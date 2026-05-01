@@ -2,8 +2,6 @@
 
 A simple, clean web app for tracking job applications — built for Ken, synced across all devices.
 
-🌐 **Live app:** https://srgent23.github.io/ken-job-tracker/
-
 -----
 
 ## What’s in the app
@@ -25,11 +23,11 @@ Tap the 🎯 button on any job card to instantly generate 7 interview questions 
 
 ### 🔔 Follow-Up Email Reminders
 
-Set a follow-up date when adding a job. On that date, Ken automatically gets an email reminder at Richardsonjr.k@gmail.com reminding him to follow up with the company.
+Set a follow-up date when adding a job. On that date, Ken automatically receives an email reminder to follow up with the company.
 
 ### 📄 Weekly PDF Report
 
-Tap **Weekly Report** in the top right to download a PDF summary of that week’s applications — great for Ken to share with his dad to show his progress.
+Tap **Weekly Report** in the top right to download a PDF summary of that week’s applications — great for sharing with a parent or support person to show progress.
 
 -----
 
@@ -45,9 +43,9 @@ Tap **Weekly Report** in the top right to download a PDF summary of that week’
 
 -----
 
-## Ken’s resumes
+## Resume versions
 
-The app has all 5 of Ken’s resumes built in as dropdown options:
+The app has all 5 resume versions built in as dropdown options:
 
 |Version|Focus                   |
 |-------|------------------------|
@@ -61,7 +59,7 @@ The app has all 5 of Ken’s resumes built in as dropdown options:
 
 ## How to use it
 
-1. Open the app at https://srgent23.github.io/ken-job-tracker/
+1. Open the app in your browser
 1. Tap **+ Add Job** to add a new application
 1. Fill in company, job title, status, which resume you sent, and optionally a follow-up date
 1. Tap **Save**
@@ -84,13 +82,21 @@ Data is stored in Firebase Firestore and syncs in real time across all devices �
 
 -----
 
-## Updating the app
+## Setup notes
 
-To make changes, edit `index.html` directly on GitHub at:
-https://github.com/srgent23/ken-job-tracker/edit/main/index.html
+To configure this app for a new user you will need to:
 
-Changes go live at the app URL within about 60 seconds.
+- Create a Firebase project and update the config in `index.html`
+- Create an EmailJS account, set up a Gmail service and email template, and update the Service ID, Template ID, and Public Key in `index.html`
+- Update the recipient email address in `index.html`
+- Update the resume version names to match the user’s actual resume files
 
 -----
 
-*Built with care for Ken. Keep applying — you’ve got this! 💪*
+## Updating the app
+
+To make changes, edit `index.html` directly on GitHub. Changes go live at the app URL within about 60 seconds.
+
+-----
+
+*Built with care. Keep applying — you’ve got this! 💪*
