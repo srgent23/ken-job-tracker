@@ -122,10 +122,14 @@
     .prep-btn { background: #EEEDFE; border: none; border-radius: var(--radius-md); padding: 8px 14px; font-size: 13px; color: #534AB7; cursor: pointer; font-family: inherit; font-weight: 500; }
     .prep-loading { font-size: 13px; color: var(--text3); padding: 8px 0; }
     .prep-questions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-    .prep-question { display: flex; gap: 10px; align-items: flex-start; background: var(--surface2); border-radius: var(--radius-md); padding: 10px 12px; }
+    .prep-question { display: flex; flex-direction: column; gap: 6px; background: var(--surface2); border-radius: var(--radius-md); padding: 10px 12px; }
+    .prep-question-top { display: flex; gap: 10px; align-items: flex-start; }
     .prep-question input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
     .prep-question label { font-size: 14px; color: var(--text); line-height: 1.5; cursor: pointer; }
     .prep-question.done label { text-decoration: line-through; color: var(--text3); }
+    .answer-toggle { font-size: 12px; color: #534AB7; cursor: pointer; padding: 4px 0 0 28px; font-weight: 500; }
+    .answer-toggle:hover { text-decoration: underline; }
+    .answer-box { background: #EEEDFE; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: #2d2a6e; line-height: 1.6; margin-left: 28px; }
 
     /* MISC */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
@@ -434,7 +438,12 @@
           max_tokens: 1000,
           messages: [{
             role: "user",
-            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". Keep questions simple and practical — this person is building interview confidence. Mix behavioral questions with basic role questions. Return ONLY a JSON array of strings, no extra text, no markdown.`
+            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". This person is building their interview confidence so keep questions practical and answers encouraging.
+
+Return ONLY a valid JSON array of objects with no extra text, no markdown, no code fences. Example format:
+[{"q":"Question here?","a":"Recommended answer here."}]
+
+Mix behavioral questions (Tell me about a time...) with basic role questions. For each answer, give a 2-3 sentence best-practice response using simple, confident language that Ken can adapt as his own.`
           }]
         })
       });
@@ -443,7 +452,12 @@
       if (!data.content || !data.content[0]) throw new Error("No response");
       const text = data.content[0].text.trim().replace(/```json|```/g, "").trim();
       const questions = JSON.parse(text);
-      prepData[id] = questions.map(q => ({ q, done: false }));
+      prepData[id] = questions.map(q => ({
+        q: typeof q === "string" ? q : q.q,
+        a: typeof q === "string" ? null : q.a,
+        done: false,
+        showAnswer: false
+      }));
       renderQuestions(id);
     } catch(e) {
       container.innerHTML = '<div class="prep-loading">Could not generate questions — please try again.</div>';
@@ -457,6 +471,12 @@
     renderQuestions(id);
   }
 
+  function toggleAnswer(id, idx) {
+    if (!prepData[id]) return;
+    prepData[id][idx].showAnswer = !prepData[id][idx].showAnswer;
+    renderQuestions(id);
+  }
+
   function renderQuestions(id) {
     const container = document.getElementById("prep-questions-" + id);
     if (!container || !prepData[id] || !prepData[id].length) return;
@@ -465,8 +485,16 @@
     if (progressEl) progressEl.textContent = doneCount + "/" + prepData[id].length + " practiced";
     container.innerHTML = prepData[id].map((item, idx) => `
       <div class="prep-question${item.done ? " done" : ""}">
-        <input type="checkbox" id="q-${id}-${idx}" ${item.done ? "checked" : ""} onchange="toggleQuestion('${id}', ${idx})">
-        <label for="q-${id}-${idx}">${item.q}</label>
+        <div class="prep-question-top">
+          <input type="checkbox" id="q-${id}-${idx}" ${item.done ? "checked" : ""} onchange="toggleQuestion('${id}', ${idx})">
+          <label for="q-${id}-${idx}">${item.q}</label>
+        </div>
+        ${item.a ? `
+          <div class="answer-toggle" onclick="toggleAnswer('${id}', ${idx})">
+            ${item.showAnswer ? "▲ Hide suggested answer" : "▼ Show suggested answer"}
+          </div>
+          ${item.showAnswer ? `<div class="answer-box">${item.a}</div>` : ""}
+        ` : ""}
       </div>
     `).join("") + `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${id}')">Generate new questions</button>`;
   }
