@@ -4,62 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ken's Job Tracker 2026</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f5f5f3;
-      --surface: #ffffff;
-      --surface2: #f0efea;
-      --border: rgba(0,0,0,0.12);
-      --border-strong: rgba(0,0,0,0.22);
-      --text: #1a1a18;
-      --text2: #5f5e5a;
-      --text3: #888780;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --green: #1D9E75;
-      --green-dark: #0F6E56;
+      --bg: #f5f5f3; --surface: #ffffff; --surface2: #f0efea;
+      --border: rgba(0,0,0,0.12); --border-strong: rgba(0,0,0,0.22);
+      --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
+      --radius-md: 8px; --radius-lg: 12px;
+      --green: #1D9E75; --green-dark: #0F6E56;
     }
-
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1a1a18;
-        --surface: #2c2c2a;
-        --surface2: #222220;
-        --border: rgba(255,255,255,0.1);
-        --border-strong: rgba(255,255,255,0.2);
-        --text: #f1efe8;
-        --text2: #b4b2a9;
-        --text3: #888780;
+        --bg: #1a1a18; --surface: #2c2c2a; --surface2: #222220;
+        --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+        --text: #f1efe8; --text2: #b4b2a9; --text3: #888780;
       }
     }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 1.5rem 1rem 3rem;
-    }
-
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem 3rem; }
     .container { max-width: 720px; margin: 0 auto; }
-
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
     .title { font-size: 22px; font-weight: 600; color: var(--text); }
     .sync-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); margin-top: 4px; }
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
     .sync-dot.online { background: #1D9E75; }
     .sync-dot.error { background: #E24B4A; }
-
     .add-btn { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 18px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
     .add-btn:hover { background: var(--green-dark); }
-
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
     .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; text-align: center; }
     .stat-num { font-size: 24px; font-weight: 600; color: var(--text); }
     .stat-label { font-size: 12px; color: var(--text3); margin-top: 3px; }
-
     .form-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: none; }
     .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -67,20 +43,11 @@
     .form-group.full { grid-column: 1 / -1; }
     .form-group label { font-size: 12px; color: var(--text2); font-weight: 500; }
     .form-group input, .form-group select, .form-group textarea {
-      border: 0.5px solid var(--border-strong);
-      border-radius: var(--radius-md);
-      padding: 9px 11px;
-      font-size: 14px;
-      background: var(--surface2);
-      color: var(--text);
-      font-family: inherit;
-      resize: none;
-      outline: none;
+      border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
+      padding: 9px 11px; font-size: 14px; background: var(--surface2);
+      color: var(--text); font-family: inherit; resize: none; outline: none;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 2px rgba(29,158,117,0.15);
-    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
     .form-group textarea { height: 70px; }
     .form-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; }
     .btn-save { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 22px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
@@ -89,12 +56,10 @@
     .btn-cancel { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 16px; font-size: 14px; color: var(--text2); cursor: pointer; font-family: inherit; }
     .btn-cancel:hover { background: var(--surface2); }
     .saving-msg { font-size: 12px; color: var(--text3); }
-
     .filters { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
     .filter-btn { background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
     .filter-btn:hover { background: var(--surface); }
     .filter-btn.active { background: #E6F1FB; color: #185FA5; border-color: transparent; }
-
     .jobs-list { display: flex; flex-direction: column; gap: 10px; }
     .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
     .job-card:hover { border-color: var(--border-strong); }
@@ -102,39 +67,32 @@
     .job-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
     .job-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
     .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-    .badge-applied   { background: #E6F1FB; color: #185FA5; }
+    .badge-applied { background: #E6F1FB; color: #185FA5; }
     .badge-interview { background: #FAEEDA; color: #854F0B; }
-    .badge-offer     { background: #EAF3DE; color: #3B6D11; }
-    .badge-rejected  { background: #FCEBEB; color: #A32D2D; }
-    .badge-waiting   { background: #EEEDFE; color: #534AB7; }
+    .badge-offer { background: #EAF3DE; color: #3B6D11; }
+    .badge-rejected { background: #FCEBEB; color: #A32D2D; }
+    .badge-waiting { background: #EEEDFE; color: #534AB7; }
     .job-date { font-size: 11px; color: var(--text3); }
     .job-note { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.55; border-top: 0.5px solid var(--border); padding-top: 8px; }
     .job-actions { display: flex; gap: 4px; }
     .icon-btn { background: transparent; border: none; cursor: pointer; padding: 5px; border-radius: 6px; color: var(--text3); font-size: 15px; line-height: 1; font-family: inherit; }
     .icon-btn:hover { background: var(--surface2); }
-
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { font-size: 36px; margin-bottom: 10px; }
     .loading { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
-
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a18; color: #f1efe8; padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px; transition: transform 0.25s ease; z-index: 999; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
-
-    @media (max-width: 480px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.full { grid-column: 1; }
-    }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: 1; } }
   </style>
 </head>
 <body>
 <div class="container">
-
   <div class="header">
     <div>
       <div class="title">Ken's Job Tracker</div>
       <div class="sync-status">
         <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">Loading...</span>
+        <span id="sync-label">Connecting...</span>
       </div>
     </div>
     <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
@@ -180,13 +138,22 @@
   </div>
 
   <div class="filters" id="filters"></div>
-  <div class="jobs-list" id="jobs-list"><div class="loading">Loading jobs...</div></div>
-
+  <div class="jobs-list" id="jobs-list"><div class="loading">Connecting to database...</div></div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-  const API = "https://script.google.com/macros/s/AKfycbykipJLR3SCsV6p2ZdazCSnf_7-Va1Cbww130uNpj38UhOXKAbCbgg_z_xr13yBG8mq/exec";
+  firebase.initializeApp({
+    apiKey: "AIzaSyBujOjHgEY56HTCVP16YdPz7W9KkxWenN0",
+    authDomain: "ken-s-job-tracker.firebaseapp.com",
+    projectId: "ken-s-job-tracker",
+    storageBucket: "ken-s-job-tracker.firebasestorage.app",
+    messagingSenderId: "897303567106",
+    appId: "1:897303567106:web:85b38f0fbe5f2813a7c01b"
+  });
+
+  const db = firebase.firestore();
+  const jobsCol = db.collection("jobs");
 
   let jobs = [];
   let filter = "all";
@@ -200,11 +167,11 @@
     rejected:  { label: "Not selected",         cls: "badge-rejected" }
   };
 
-  function setSyncStatus(state, msg) {
+  function setSyncStatus(state) {
     const dot = document.getElementById("sync-dot");
     const label = document.getElementById("sync-label");
     dot.className = "sync-dot" + (state === "online" ? " online" : state === "error" ? " error" : "");
-    label.textContent = msg || (state === "online" ? "Synced with Google Sheets" : state === "error" ? "Connection error" : "Loading...");
+    label.textContent = state === "online" ? "Synced across all devices" : state === "error" ? "Connection error — check internet" : "Connecting...";
   }
 
   function showToast(msg) {
@@ -214,25 +181,14 @@
     setTimeout(() => t.classList.remove("show"), 2500);
   }
 
-  async function loadJobs() {
-    try {
-      const res = await fetch(API);
-      jobs = await res.json();
+  jobsCol.orderBy("createdAt", "desc").onSnapshot(
+    snapshot => {
+      jobs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setSyncStatus("online");
       render();
-    } catch(e) {
-      setSyncStatus("error", "Could not load — check internet");
-      document.getElementById("jobs-list").innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Could not connect to Google Sheets.<br>Check your internet and reload the page.</div>`;
-    }
-  }
-
-  async function apiPost(payload) {
-    const res = await fetch(API, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    return res.json();
-  }
+    },
+    err => { console.error(err); setSyncStatus("error"); }
+  );
 
   function toggleForm() {
     editId = null;
@@ -264,8 +220,6 @@
     savingMsg.textContent = "Saving...";
 
     const data = {
-      action: editId ? "update" : "add",
-      id: editId || "",
       company, role,
       date: document.getElementById("f-date").value,
       status: document.getElementById("f-status").value,
@@ -273,12 +227,18 @@
     };
 
     try {
-      await apiPost(data);
-      showToast(editId ? "Job updated!" : "Job saved!");
+      if (editId) {
+        await jobsCol.doc(editId).update(data);
+        showToast("Job updated!");
+      } else {
+        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        await jobsCol.add(data);
+        showToast("Job saved!");
+      }
       cancelForm();
-      await loadJobs();
     } catch(e) {
       alert("Could not save — check your internet connection.");
+      console.error(e);
     } finally {
       saveBtn.disabled = false;
       savingMsg.textContent = "";
@@ -303,18 +263,14 @@
   async function deleteJob(id) {
     if (!confirm("Remove this application?")) return;
     try {
-      await apiPost({ action: "delete", id });
+      await jobsCol.doc(id).delete();
       showToast("Job removed.");
-      await loadJobs();
     } catch(e) {
       alert("Could not delete — check your internet connection.");
     }
   }
 
-  function setFilter(f) {
-    filter = f;
-    render();
-  }
+  function setFilter(f) { filter = f; render(); }
 
   function fmtDate(d) {
     if (!d) return "";
@@ -366,8 +322,6 @@
       </div>`;
     }).join("");
   }
-
-  loadJobs();
 </script>
 </body>
 </html>
