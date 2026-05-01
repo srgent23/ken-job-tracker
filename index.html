@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ken's Job Tracker</title>
   <link rel="apple-touch-icon" href="icon.png">
-<meta name="apple-mobile-web-app-title" content="Ken's Jobs">
-<meta name="apple-mobile-web-app-capable" content="yes">
-  <title>Ken's Job Tracker 2026</title>
+  <meta name="apple-mobile-web-app-title" content="Ken's Jobs">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -26,21 +28,30 @@
       }
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem 3rem; }
-    .container { max-width: 720px; margin: 0 auto; }
+    .container { max-width: 740px; margin: 0 auto; }
+
+    /* HEADER */
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-    .title { font-size: 22px; font-weight: 600; color: var(--text); }
+    .title { font-size: 22px; font-weight: 600; }
     .sync-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); margin-top: 4px; }
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
     .sync-dot.online { background: #1D9E75; }
     .sync-dot.error { background: #E24B4A; }
+    .header-btns { display: flex; gap: 8px; flex-wrap: wrap; }
     .add-btn { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 18px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
     .add-btn:hover { background: var(--green-dark); }
+    .pdf-btn { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 14px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; }
+    .pdf-btn:hover { background: var(--surface2); }
+
+    /* STATS */
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
     .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; text-align: center; }
-    .stat-num { font-size: 24px; font-weight: 600; color: var(--text); }
+    .stat-num { font-size: 24px; font-weight: 600; }
     .stat-label { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+    /* FORM */
     .form-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: none; }
-    .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; color: var(--text); }
+    .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group.full { grid-column: 1 / -1; }
@@ -52,44 +63,73 @@
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
     .form-group textarea { height: 70px; }
-    .form-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; }
+    .form-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; flex-wrap: wrap; }
     .btn-save { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 22px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
     .btn-save:hover { background: var(--green-dark); }
     .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-cancel { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 16px; font-size: 14px; color: var(--text2); cursor: pointer; font-family: inherit; }
     .btn-cancel:hover { background: var(--surface2); }
     .saving-msg { font-size: 12px; color: var(--text3); }
+
+    /* FILTERS */
     .filters { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
     .filter-btn { background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
     .filter-btn:hover { background: var(--surface); }
     .filter-btn.active { background: #E6F1FB; color: #185FA5; border-color: transparent; }
+
+    /* JOB CARDS */
     .jobs-list { display: flex; flex-direction: column; gap: 10px; }
-    .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+    .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
     .job-card:hover { border-color: var(--border-strong); }
-    .job-company { font-size: 15px; font-weight: 600; color: var(--text); }
+    .job-card-top { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
+    .job-company { font-size: 15px; font-weight: 600; }
     .job-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
     .job-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
     .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-    .badge-applied { background: #E6F1FB; color: #185FA5; }
+    .badge-applied   { background: #E6F1FB; color: #185FA5; }
     .badge-interview { background: #FAEEDA; color: #854F0B; }
-    .badge-offer { background: #EAF3DE; color: #3B6D11; }
-    .badge-rejected { background: #FCEBEB; color: #A32D2D; }
-    .badge-waiting { background: #EEEDFE; color: #534AB7; }
+    .badge-offer     { background: #EAF3DE; color: #3B6D11; }
+    .badge-rejected  { background: #FCEBEB; color: #A32D2D; }
+    .badge-waiting   { background: #EEEDFE; color: #534AB7; }
     .job-date { font-size: 11px; color: var(--text3); }
+    .job-resume { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 8px; border-radius: 10px; }
+    .job-followup { font-size: 11px; color: #854F0B; background: #FAEEDA; padding: 2px 8px; border-radius: 10px; }
+    .job-followup.overdue { color: #A32D2D; background: #FCEBEB; }
     .job-note { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.55; border-top: 0.5px solid var(--border); padding-top: 8px; }
     .job-actions { display: flex; gap: 4px; }
     .icon-btn { background: transparent; border: none; cursor: pointer; padding: 5px; border-radius: 6px; color: var(--text3); font-size: 15px; line-height: 1; font-family: inherit; }
     .icon-btn:hover { background: var(--surface2); }
+
+    /* INTERVIEW PREP PANEL */
+    .prep-panel { margin-top: 10px; border-top: 0.5px solid var(--border); padding-top: 10px; display: none; }
+    .prep-panel.open { display: block; }
+    .prep-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+    .prep-btn { background: #EEEDFE; border: none; border-radius: var(--radius-md); padding: 7px 14px; font-size: 12px; color: #534AB7; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .prep-btn:hover { background: #dddcfd; }
+    .prep-loading { font-size: 12px; color: var(--text3); padding: 8px 0; }
+    .prep-questions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+    .prep-question { display: flex; gap: 10px; align-items: flex-start; background: var(--surface2); border-radius: var(--radius-md); padding: 10px 12px; }
+    .prep-question input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; }
+    .prep-question label { font-size: 13px; color: var(--text); line-height: 1.5; cursor: pointer; }
+    .prep-question.done label { text-decoration: line-through; color: var(--text3); }
+
+    /* MISC */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { font-size: 36px; margin-bottom: 10px; }
     .loading { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a18; color: #f1efe8; padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px; transition: transform 0.25s ease; z-index: 999; white-space: nowrap; }
     .toast.show { transform: translateX(-50%) translateY(0); }
-    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: 1; } }
+    .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
+
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+    }
   </style>
 </head>
 <body>
 <div class="container">
+
   <div class="header">
     <div>
       <div class="title">Ken's Job Tracker</div>
@@ -98,7 +138,10 @@
         <span id="sync-label">Connecting...</span>
       </div>
     </div>
-    <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
+    <div class="header-btns">
+      <button class="pdf-btn" onclick="exportPDF()">📄 Weekly Report</button>
+      <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
+    </div>
   </div>
 
   <div class="stats" id="stats"></div>
@@ -128,6 +171,21 @@
           <option value="rejected">Not selected</option>
         </select>
       </div>
+      <div class="form-group">
+        <label>Resume used</label>
+        <select id="f-resume">
+          <option value="">-- Select resume --</option>
+          <option value="Ken_V1_Retail_Sales">V1 — Retail Sales</option>
+          <option value="Ken_V2_Warehouse_Logistics">V2 — Warehouse & Logistics</option>
+          <option value="Ken_V3_Customer_Service">V3 — Customer Service</option>
+          <option value="Ken_V4_Facilities_Maintenance">V4 — Facilities & Maintenance</option>
+          <option value="Ken_V5_FoodService_Grocery">V5 — Food Service & Grocery</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Follow-up reminder date</label>
+        <input type="date" id="f-followup" />
+      </div>
       <div class="form-group full">
         <label>Notes (optional)</label>
         <textarea id="f-notes" placeholder="Contact name, next steps, anything helpful..."></textarea>
@@ -142,10 +200,12 @@
 
   <div class="filters" id="filters"></div>
   <div class="jobs-list" id="jobs-list"><div class="loading">Connecting to database...</div></div>
+
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
+  // ── Firebase ──────────────────────────────────────────────
   firebase.initializeApp({
     apiKey: "AIzaSyBujOjHgEY56HTCVP16YdPz7W9KkxWenN0",
     authDomain: "ken-s-job-tracker.firebaseapp.com",
@@ -154,13 +214,28 @@
     messagingSenderId: "897303567106",
     appId: "1:897303567106:web:85b38f0fbe5f2813a7c01b"
   });
-
   const db = firebase.firestore();
   const jobsCol = db.collection("jobs");
 
+  // ── EmailJS ───────────────────────────────────────────────
+  emailjs.init("XmyK73Pn4qFYKPKTk");
+  const EMAILJS_SERVICE  = "service_3zd2p55";
+  const EMAILJS_TEMPLATE = "template_dtenbe8";
+  const KEN_EMAIL        = "Richardsonjr.k@gmail.com";
+
+  // ── State ─────────────────────────────────────────────────
   let jobs = [];
   let filter = "all";
   let editId = null;
+  let prepData = {}; // jobId -> [{q, done}]
+
+  const RESUMES = {
+    "Ken_V1_Retail_Sales":          "V1 — Retail Sales",
+    "Ken_V2_Warehouse_Logistics":   "V2 — Warehouse & Logistics",
+    "Ken_V3_Customer_Service":      "V3 — Customer Service",
+    "Ken_V4_Facilities_Maintenance":"V4 — Facilities & Maintenance",
+    "Ken_V5_FoodService_Grocery":   "V5 — Food Service & Grocery"
+  };
 
   const statusConfig = {
     applied:   { label: "Applied",              cls: "badge-applied" },
@@ -170,29 +245,64 @@
     rejected:  { label: "Not selected",         cls: "badge-rejected" }
   };
 
+  // ── Helpers ───────────────────────────────────────────────
   function setSyncStatus(state) {
     const dot = document.getElementById("sync-dot");
     const label = document.getElementById("sync-label");
     dot.className = "sync-dot" + (state === "online" ? " online" : state === "error" ? " error" : "");
-    label.textContent = state === "online" ? "Synced across all devices" : state === "error" ? "Connection error — check internet" : "Connecting...";
+    label.textContent = state === "online" ? "Synced across all devices" : state === "error" ? "Connection error" : "Connecting...";
   }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg;
     t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2500);
+    setTimeout(() => t.classList.remove("show"), 3000);
   }
 
+  function fmtDate(d) {
+    if (!d) return "";
+    const parts = d.split("-");
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return months[parseInt(parts[1]) - 1] + " " + parseInt(parts[2]) + ", " + parts[0];
+  }
+
+  function isOverdue(dateStr) {
+    if (!dateStr) return false;
+    return new Date(dateStr) < new Date();
+  }
+
+  // ── Firebase listener ─────────────────────────────────────
   jobsCol.orderBy("createdAt", "desc").onSnapshot(
     snapshot => {
       jobs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setSyncStatus("online");
+      checkFollowUpReminders();
       render();
     },
     err => { console.error(err); setSyncStatus("error"); }
   );
 
+  // ── Follow-up reminders ───────────────────────────────────
+  function checkFollowUpReminders() {
+    const today = new Date().toISOString().split("T")[0];
+    jobs.forEach(j => {
+      if (j.followup && j.followup === today && !j.reminderSent) {
+        emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+          company: j.company,
+          role: j.role,
+          date: fmtDate(j.date),
+          to_email: KEN_EMAIL,
+          name: "Ken"
+        }).then(() => {
+          jobsCol.doc(j.id).update({ reminderSent: true });
+          showToast(`📧 Reminder sent for ${j.company}!`);
+        }).catch(e => console.error("Email error:", e));
+      }
+    });
+  }
+
+  // ── Form ──────────────────────────────────────────────────
   function toggleForm() {
     editId = null;
     document.getElementById("form-title").textContent = "New job application";
@@ -200,6 +310,8 @@
     document.getElementById("f-role").value = "";
     document.getElementById("f-date").value = new Date().toISOString().split("T")[0];
     document.getElementById("f-status").value = "applied";
+    document.getElementById("f-resume").value = "";
+    document.getElementById("f-followup").value = "";
     document.getElementById("f-notes").value = "";
     document.getElementById("saving-msg").textContent = "";
     document.getElementById("form-card").style.display = "block";
@@ -226,7 +338,10 @@
       company, role,
       date: document.getElementById("f-date").value,
       status: document.getElementById("f-status").value,
-      notes: document.getElementById("f-notes").value.trim()
+      resume: document.getElementById("f-resume").value,
+      followup: document.getElementById("f-followup").value,
+      notes: document.getElementById("f-notes").value.trim(),
+      reminderSent: false
     };
 
     try {
@@ -236,7 +351,7 @@
       } else {
         data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
         await jobsCol.add(data);
-        showToast("Job saved!");
+        showToast("Job saved! 🎉");
       }
       cancelForm();
     } catch(e) {
@@ -257,6 +372,8 @@
     document.getElementById("f-role").value = j.role;
     document.getElementById("f-date").value = j.date || "";
     document.getElementById("f-status").value = j.status;
+    document.getElementById("f-resume").value = j.resume || "";
+    document.getElementById("f-followup").value = j.followup || "";
     document.getElementById("f-notes").value = j.notes || "";
     document.getElementById("saving-msg").textContent = "";
     document.getElementById("form-card").style.display = "block";
@@ -273,14 +390,166 @@
     }
   }
 
-  function setFilter(f) { filter = f; render(); }
-
-  function fmtDate(d) {
-    if (!d) return "";
-    const parts = d.split("-");
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    return months[parseInt(parts[1]) - 1] + " " + parseInt(parts[2]) + ", " + parts[0];
+  // ── Interview Prep (Claude AI) ────────────────────────────
+  function togglePrep(id) {
+    const panel = document.getElementById("prep-" + id);
+    if (!panel) return;
+    panel.classList.toggle("open");
   }
+
+  async function generateQuestions(id) {
+    const j = jobs.find(j => j.id === id);
+    if (!j) return;
+
+    const panel = document.getElementById("prep-" + id);
+    const container = document.getElementById("prep-questions-" + id);
+    container.innerHTML = '<div class="prep-loading">✨ Generating interview questions for ' + j.company + '...</div>';
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [{
+            role: "user",
+            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". 
+            Keep the questions simple and practical — this person is building their interview confidence. 
+            Mix behavioral questions ("Tell me about a time...") with basic role questions.
+            Return ONLY a JSON array of strings, no extra text. Example: ["Question 1", "Question 2"]`
+          }]
+        })
+      });
+
+      const data = await response.json();
+      const text = data.content[0].text.trim();
+      const questions = JSON.parse(text.replace(/```json|```/g, "").trim());
+
+      prepData[id] = questions.map(q => ({ q, done: false }));
+      renderQuestions(id);
+    } catch(e) {
+      container.innerHTML = '<div class="prep-loading">Could not generate questions — try again.</div>';
+      console.error(e);
+    }
+  }
+
+  function toggleQuestion(id, idx) {
+    if (!prepData[id]) return;
+    prepData[id][idx].done = !prepData[id][idx].done;
+    renderQuestions(id);
+  }
+
+  function renderQuestions(id) {
+    const container = document.getElementById("prep-questions-" + id);
+    if (!prepData[id] || !prepData[id].length) return;
+    container.innerHTML = prepData[id].map((item, idx) => `
+      <div class="prep-question${item.done ? " done" : ""}">
+        <input type="checkbox" id="q-${id}-${idx}" ${item.done ? "checked" : ""} onchange="toggleQuestion('${id}', ${idx})">
+        <label for="q-${id}-${idx}">${item.q}</label>
+      </div>
+    `).join("");
+  }
+
+  // ── PDF Export ────────────────────────────────────────────
+  function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const today = new Date();
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - 7);
+
+    const weekJobs = jobs.filter(j => {
+      if (!j.date) return false;
+      const d = new Date(j.date);
+      return d >= weekStart && d <= today;
+    });
+
+    // Header
+    doc.setFillColor(29, 158, 117);
+    doc.rect(0, 0, 210, 35, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Ken's Job Tracker", 15, 15);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Weekly Report — " + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }), 15, 25);
+
+    // Summary box
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("This Week's Summary", 15, 48);
+
+    doc.setFillColor(245, 245, 243);
+    doc.rect(15, 52, 180, 28, "F");
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Total applications this week: ${weekJobs.length}`, 20, 62);
+    doc.text(`Interviews scheduled: ${weekJobs.filter(j => j.status === "interview").length}`, 20, 70);
+    doc.text(`Offers received: ${weekJobs.filter(j => j.status === "offer").length}`, 110, 62);
+    doc.text(`Waiting to hear back: ${weekJobs.filter(j => j.status === "waiting").length}`, 110, 70);
+
+    // All jobs this week
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 30, 30);
+    doc.text("Applications This Week", 15, 92);
+
+    let y = 100;
+    if (weekJobs.length === 0) {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(120, 120, 120);
+      doc.text("No applications recorded this week.", 20, y);
+    } else {
+      weekJobs.forEach((j, i) => {
+        if (y > 260) { doc.addPage(); y = 20; }
+        const sc = statusConfig[j.status] || statusConfig.applied;
+        doc.setFillColor(248, 248, 248);
+        doc.rect(15, y - 5, 180, 22, "F");
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        doc.text(j.company, 20, y + 4);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+        doc.text(j.role, 20, y + 11);
+        doc.text("Status: " + sc.label, 120, y + 4);
+        if (j.resume && RESUMES[j.resume]) doc.text("Resume: " + RESUMES[j.resume], 120, y + 11);
+        y += 28;
+      });
+    }
+
+    // All-time totals
+    if (y > 240) { doc.addPage(); y = 20; }
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 30, 30);
+    doc.text("All-Time Totals", 15, y + 10);
+    y += 18;
+    doc.setFillColor(29, 158, 117);
+    doc.rect(15, y, 180, 20, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Total applications: ${jobs.length}   |   Interviews: ${jobs.filter(j=>j.status==="interview").length}   |   Offers: ${jobs.filter(j=>j.status==="offer").length}`, 20, y + 13);
+
+    // Footer
+    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(9);
+    doc.text("Generated by Ken's Job Tracker • Keep up the great work, Ken! 💪", 15, 285);
+
+    doc.save("Ken_Job_Report_" + today.toISOString().split("T")[0] + ".pdf");
+    showToast("📄 Weekly report downloaded!");
+  }
+
+  // ── Filters & Render ──────────────────────────────────────
+  function setFilter(f) { filter = f; render(); }
 
   function render() {
     const counts = { all: jobs.length };
@@ -308,22 +577,44 @@
 
     list.innerHTML = visible.map(j => {
       const sc = statusConfig[j.status] || statusConfig.applied;
+      const overdue = isOverdue(j.followup) && j.status !== "offer" && j.status !== "rejected";
+      const questions = prepData[j.id] || [];
+      const doneCount = questions.filter(q => q.done).length;
+
       return `<div class="job-card">
-        <div>
-          <div class="job-company">${j.company}</div>
-          <div class="job-role">${j.role}</div>
-          <div class="job-meta">
-            <span class="badge ${sc.cls}">${sc.label}</span>
-            ${j.date ? `<span class="job-date">Applied ${fmtDate(j.date)}</span>` : ""}
+        <div class="job-card-top">
+          <div>
+            <div class="job-company">${j.company}</div>
+            <div class="job-role">${j.role}</div>
+            <div class="job-meta">
+              <span class="badge ${sc.cls}">${sc.label}</span>
+              ${j.date ? `<span class="job-date">Applied ${fmtDate(j.date)}</span>` : ""}
+              ${j.resume && RESUMES[j.resume] ? `<span class="job-resume">📄 ${RESUMES[j.resume]}</span>` : ""}
+              ${j.followup ? `<span class="job-followup${overdue ? " overdue" : ""}">🔔 Follow up ${fmtDate(j.followup)}${overdue ? " (overdue)" : ""}</span>` : ""}
+            </div>
+            ${j.notes ? `<div class="job-note">${j.notes}</div>` : ""}
           </div>
-          ${j.notes ? `<div class="job-note">${j.notes}</div>` : ""}
+          <div class="job-actions">
+            <button class="icon-btn" title="Interview Prep" onclick="togglePrep('${j.id}')">🎯</button>
+            <button class="icon-btn" title="Edit" onclick="editJob('${j.id}')">✏️</button>
+            <button class="icon-btn" title="Delete" onclick="deleteJob('${j.id}')">🗑️</button>
+          </div>
         </div>
-        <div class="job-actions">
-          <button class="icon-btn" title="Edit" onclick="editJob('${j.id}')">✏️</button>
-          <button class="icon-btn" title="Delete" onclick="deleteJob('${j.id}')">🗑️</button>
+        <div class="prep-panel" id="prep-${j.id}">
+          <div class="prep-title">🎯 Interview Prep — ${j.company}${questions.length ? ` (${doneCount}/${questions.length} practiced)` : ""}</div>
+          ${!questions.length
+            ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">✨ Generate interview questions</button>`
+            : ""}
+          <div class="prep-questions" id="prep-questions-${j.id}"></div>
+          ${questions.length ? `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${j.id}')">🔄 Regenerate questions</button>` : ""}
         </div>
       </div>`;
     }).join("");
+
+    // Re-render any open prep panels
+    visible.forEach(j => {
+      if (prepData[j.id] && prepData[j.id].length) renderQuestions(j.id);
+    });
   }
 </script>
 </body>
