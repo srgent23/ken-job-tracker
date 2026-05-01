@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Ken's Job Tracker</title>
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-title" content="Ken's Jobs">
@@ -27,64 +27,70 @@
         --text: #f1efe8; --text2: #b4b2a9; --text3: #888780;
       }
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem 3rem; }
-    .container { max-width: 740px; margin: 0 auto; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem 1rem 3rem; }
+    .container { max-width: 740px; margin: 0 auto; width: 100%; }
+
+    /* iPhone safe area support */
+    @supports (padding: max(0px)) {
+      body { padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); padding-bottom: max(3rem, env(safe-area-inset-bottom)); }
+    }
 
     /* HEADER */
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-    .title { font-size: 22px; font-weight: 600; }
-    .sync-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); margin-top: 4px; }
+    .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; gap: 10px; }
+    .title { font-size: 20px; font-weight: 600; }
+    @media (min-width: 600px) { .title { font-size: 24px; } .header { margin-bottom: 1.5rem; } }
+    .sync-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); margin-top: 3px; }
     .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #888; flex-shrink: 0; }
     .sync-dot.online { background: #1D9E75; }
     .sync-dot.error { background: #E24B4A; }
-    .header-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-    .add-btn { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 18px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
+    .header-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .add-btn { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 14px; font-size: 13px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; white-space: nowrap; }
     .add-btn:hover { background: var(--green-dark); }
-    .pdf-btn { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 14px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; }
+    .pdf-btn { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 12px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; white-space: nowrap; }
     .pdf-btn:hover { background: var(--surface2); }
 
-    /* STATS */
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-    .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 14px; text-align: center; }
-    .stat-num { font-size: 24px; font-weight: 600; }
-    .stat-label { font-size: 12px; color: var(--text3); margin-top: 3px; }
+    /* STATS - 2x2 on phone, 4 across on laptop */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+    @media (min-width: 600px) { .stats { grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; } }
+    .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 600; }
+    .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
     /* FORM */
-    .form-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; display: none; }
+    .form-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; display: none; }
     .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 600px) { .form-grid { grid-template-columns: 1fr 1fr; } .form-group.full { grid-column: 1 / -1; } }
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-group.full { grid-column: 1 / -1; }
     .form-group label { font-size: 12px; color: var(--text2); font-weight: 500; }
     .form-group input, .form-group select, .form-group textarea {
       border: 0.5px solid var(--border-strong); border-radius: var(--radius-md);
-      padding: 9px 11px; font-size: 14px; background: var(--surface2);
+      padding: 9px 11px; font-size: 16px; background: var(--surface2);
       color: var(--text); font-family: inherit; resize: none; outline: none;
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
-    .form-group textarea { height: 70px; }
+    .form-group textarea { height: 70px; font-size: 16px; }
     .form-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; flex-wrap: wrap; }
-    .btn-save { background: var(--green); border: none; border-radius: var(--radius-md); padding: 9px 22px; font-size: 14px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
+    .btn-save { background: var(--green); border: none; border-radius: var(--radius-md); padding: 10px 22px; font-size: 15px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; }
     .btn-save:hover { background: var(--green-dark); }
     .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-cancel { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 16px; font-size: 14px; color: var(--text2); cursor: pointer; font-family: inherit; }
-    .btn-cancel:hover { background: var(--surface2); }
+    .btn-cancel { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 10px 16px; font-size: 15px; color: var(--text2); cursor: pointer; font-family: inherit; }
     .saving-msg { font-size: 12px; color: var(--text3); }
 
     /* FILTERS */
-    .filters { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-    .filter-btn { background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
-    .filter-btn:hover { background: var(--surface); }
+    .filters { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-btn { background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
     .filter-btn.active { background: #E6F1FB; color: #185FA5; border-color: transparent; }
 
     /* JOB CARDS */
     .jobs-list { display: flex; flex-direction: column; gap: 10px; }
-    .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
-    .job-card:hover { border-color: var(--border-strong); }
-    .job-card-top { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; }
-    .job-company { font-size: 15px; font-weight: 600; }
+    .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+    .job-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .job-info { flex: 1; min-width: 0; }
+    .job-company { font-size: 16px; font-weight: 600; }
     .job-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
-    .job-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+    .job-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
     .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
     .badge-applied   { background: #E6F1FB; color: #185FA5; }
     .badge-interview { background: #FAEEDA; color: #854F0B; }
@@ -95,36 +101,38 @@
     .job-resume { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 8px; border-radius: 10px; }
     .job-followup { font-size: 11px; color: #854F0B; background: #FAEEDA; padding: 2px 8px; border-radius: 10px; }
     .job-followup.overdue { color: #A32D2D; background: #FCEBEB; }
-    .job-note { font-size: 12px; color: var(--text2); margin-top: 8px; line-height: 1.55; border-top: 0.5px solid var(--border); padding-top: 8px; }
-    .job-actions { display: flex; gap: 4px; }
-    .icon-btn { background: transparent; border: none; cursor: pointer; padding: 5px; border-radius: 6px; color: var(--text3); font-size: 15px; line-height: 1; font-family: inherit; }
-    .icon-btn:hover { background: var(--surface2); }
+    .job-note { font-size: 13px; color: var(--text2); margin-top: 8px; line-height: 1.55; border-top: 0.5px solid var(--border); padding-top: 8px; }
+
+    /* ACTION BUTTONS WITH LABELS */
+    .job-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+    @media (min-width: 600px) { .job-actions { flex-direction: row; align-items: flex-start; } }
+    .action-btn { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; padding: 6px 8px; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; }
+    .action-btn:hover { background: var(--border); }
+    .action-btn .btn-icon { font-size: 16px; line-height: 1; }
+    .action-btn .btn-label { font-size: 9px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+    .action-btn.prep-active { background: #EEEDFE; border-color: #534AB7; }
+    .action-btn.prep-active .btn-label { color: #534AB7; }
 
     /* INTERVIEW PREP PANEL */
     .prep-panel { margin-top: 10px; border-top: 0.5px solid var(--border); padding-top: 10px; display: none; }
     .prep-panel.open { display: block; }
-    .prep-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
-    .prep-btn { background: #EEEDFE; border: none; border-radius: var(--radius-md); padding: 7px 14px; font-size: 12px; color: #534AB7; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .prep-btn:hover { background: #dddcfd; }
-    .prep-loading { font-size: 12px; color: var(--text3); padding: 8px 0; }
+    .prep-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .prep-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+    .prep-progress { font-size: 11px; color: var(--text3); }
+    .prep-btn { background: #EEEDFE; border: none; border-radius: var(--radius-md); padding: 8px 14px; font-size: 13px; color: #534AB7; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .prep-loading { font-size: 13px; color: var(--text3); padding: 8px 0; }
     .prep-questions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
     .prep-question { display: flex; gap: 10px; align-items: flex-start; background: var(--surface2); border-radius: var(--radius-md); padding: 10px 12px; }
-    .prep-question input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; }
-    .prep-question label { font-size: 13px; color: var(--text); line-height: 1.5; cursor: pointer; }
+    .prep-question input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+    .prep-question label { font-size: 14px; color: var(--text); line-height: 1.5; cursor: pointer; }
     .prep-question.done label { text-decoration: line-through; color: var(--text3); }
 
     /* MISC */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { font-size: 36px; margin-bottom: 10px; }
     .loading { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a18; color: #f1efe8; padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px; transition: transform 0.25s ease; z-index: 999; white-space: nowrap; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a18; color: #f1efe8; padding: 10px 20px; border-radius: var(--radius-md); font-size: 13px; transition: transform 0.25s ease; z-index: 999; white-space: nowrap; max-width: 90vw; text-align: center; }
     .toast.show { transform: translateX(-50%) translateY(0); }
-    .section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
-
-    @media (max-width: 480px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.full { grid-column: 1; }
-    }
   </style>
 </head>
 <body>
@@ -139,7 +147,7 @@
       </div>
     </div>
     <div class="header-btns">
-      <button class="pdf-btn" onclick="exportPDF()">📄 Weekly Report</button>
+      <button class="pdf-btn" onclick="exportPDF()">📄 Report</button>
       <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
     </div>
   </div>
@@ -151,11 +159,11 @@
     <div class="form-grid">
       <div class="form-group">
         <label>Company name *</label>
-        <input type="text" id="f-company" placeholder="e.g. Best Buy" />
+        <input type="text" id="f-company" placeholder="e.g. Best Buy" autocomplete="off" />
       </div>
       <div class="form-group">
         <label>Job title *</label>
-        <input type="text" id="f-role" placeholder="e.g. Sales Advisor" />
+        <input type="text" id="f-role" placeholder="e.g. Sales Advisor" autocomplete="off" />
       </div>
       <div class="form-group">
         <label>Date applied</label>
@@ -223,11 +231,15 @@
   const EMAILJS_TEMPLATE = "template_dtenbe8";
   const KEN_EMAIL        = "Richardsonjr.k@gmail.com";
 
+  // ── Anthropic API key — REPLACE THIS ─────────────────────
+  const PROXY_URL = "https://ken-interview-proxy.teamvoulfn.workers.dev";
+
   // ── State ─────────────────────────────────────────────────
   let jobs = [];
   let filter = "all";
   let editId = null;
-  let prepData = {}; // jobId -> [{q, done}]
+  let prepData = {};
+  let openPrep = {};
 
   const RESUMES = {
     "Ken_V1_Retail_Sales":          "V1 — Retail Sales",
@@ -296,7 +308,7 @@
           name: "Ken"
         }).then(() => {
           jobsCol.doc(j.id).update({ reminderSent: true });
-          showToast(`📧 Reminder sent for ${j.company}!`);
+          showToast("Reminder email sent for " + j.company + "!");
         }).catch(e => console.error("Email error:", e));
       }
     });
@@ -315,7 +327,7 @@
     document.getElementById("f-notes").value = "";
     document.getElementById("saving-msg").textContent = "";
     document.getElementById("form-card").style.display = "block";
-    document.getElementById("f-company").focus();
+    setTimeout(() => document.getElementById("f-company").focus(), 100);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -351,7 +363,7 @@
       } else {
         data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
         await jobsCol.add(data);
-        showToast("Job saved! 🎉");
+        showToast("Job saved!");
       }
       cancelForm();
     } catch(e) {
@@ -381,7 +393,8 @@
   }
 
   async function deleteJob(id) {
-    if (!confirm("Remove this application?")) return;
+    const j = jobs.find(j => j.id === id);
+    if (!confirm("Remove " + (j ? j.company : "this") + " from your applications?")) return;
     try {
       await jobsCol.doc(id).delete();
       showToast("Job removed.");
@@ -390,46 +403,50 @@
     }
   }
 
-  // ── Interview Prep (Claude AI) ────────────────────────────
+  // ── Interview Prep ────────────────────────────────────────
   function togglePrep(id) {
+    openPrep[id] = !openPrep[id];
     const panel = document.getElementById("prep-" + id);
-    if (!panel) return;
-    panel.classList.toggle("open");
+    const btn = document.getElementById("prepbtn-" + id);
+    if (panel) panel.classList.toggle("open", !!openPrep[id]);
+    if (btn) btn.classList.toggle("prep-active", !!openPrep[id]);
   }
 
   async function generateQuestions(id) {
+    if (!PROXY_URL) {
+      document.getElementById("prep-questions-" + id).innerHTML = '<div class="prep-loading">Interview prep needs setup — contact your app helper to add the API key.</div>';
+      return;
+    }
+
     const j = jobs.find(j => j.id === id);
     if (!j) return;
-
-    const panel = document.getElementById("prep-" + id);
     const container = document.getElementById("prep-questions-" + id);
-    container.innerHTML = '<div class="prep-loading">✨ Generating interview questions for ' + j.company + '...</div>';
+    container.innerHTML = '<div class="prep-loading">Generating interview questions for ' + j.company + '...</div>';
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch(PROXY_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 1000,
           messages: [{
             role: "user",
-            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". 
-            Keep the questions simple and practical — this person is building their interview confidence. 
-            Mix behavioral questions ("Tell me about a time...") with basic role questions.
-            Return ONLY a JSON array of strings, no extra text. Example: ["Question 1", "Question 2"]`
+            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". Keep questions simple and practical — this person is building interview confidence. Mix behavioral questions with basic role questions. Return ONLY a JSON array of strings, no extra text, no markdown.`
           }]
         })
       });
 
       const data = await response.json();
-      const text = data.content[0].text.trim();
-      const questions = JSON.parse(text.replace(/```json|```/g, "").trim());
-
+      if (!data.content || !data.content[0]) throw new Error("No response");
+      const text = data.content[0].text.trim().replace(/```json|```/g, "").trim();
+      const questions = JSON.parse(text);
       prepData[id] = questions.map(q => ({ q, done: false }));
       renderQuestions(id);
     } catch(e) {
-      container.innerHTML = '<div class="prep-loading">Could not generate questions — try again.</div>';
+      container.innerHTML = '<div class="prep-loading">Could not generate questions — please try again.</div>';
       console.error(e);
     }
   }
@@ -442,20 +459,22 @@
 
   function renderQuestions(id) {
     const container = document.getElementById("prep-questions-" + id);
-    if (!prepData[id] || !prepData[id].length) return;
+    if (!container || !prepData[id] || !prepData[id].length) return;
+    const doneCount = prepData[id].filter(q => q.done).length;
+    const progressEl = document.getElementById("prep-progress-" + id);
+    if (progressEl) progressEl.textContent = doneCount + "/" + prepData[id].length + " practiced";
     container.innerHTML = prepData[id].map((item, idx) => `
       <div class="prep-question${item.done ? " done" : ""}">
         <input type="checkbox" id="q-${id}-${idx}" ${item.done ? "checked" : ""} onchange="toggleQuestion('${id}', ${idx})">
         <label for="q-${id}-${idx}">${item.q}</label>
       </div>
-    `).join("");
+    `).join("") + `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${id}')">Generate new questions</button>`;
   }
 
   // ── PDF Export ────────────────────────────────────────────
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - 7);
@@ -475,42 +494,42 @@
     doc.text("Ken's Job Tracker", 15, 15);
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.text("Weekly Report — " + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }), 15, 25);
+    doc.text("Weekly Report -- " + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }), 15, 26);
 
-    // Summary box
+    // Summary
     doc.setTextColor(30, 30, 30);
-    doc.setFontSize(12);
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.text("This Week's Summary", 15, 48);
-
     doc.setFillColor(245, 245, 243);
     doc.rect(15, 52, 180, 28, "F");
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(80, 80, 80);
-    doc.text(`Total applications this week: ${weekJobs.length}`, 20, 62);
-    doc.text(`Interviews scheduled: ${weekJobs.filter(j => j.status === "interview").length}`, 20, 70);
-    doc.text(`Offers received: ${weekJobs.filter(j => j.status === "offer").length}`, 110, 62);
-    doc.text(`Waiting to hear back: ${weekJobs.filter(j => j.status === "waiting").length}`, 110, 70);
+    doc.text("Total applications this week: " + weekJobs.length, 20, 62);
+    doc.text("Interviews scheduled: " + weekJobs.filter(j => j.status === "interview").length, 20, 70);
+    doc.text("Offers received: " + weekJobs.filter(j => j.status === "offer").length, 110, 62);
+    doc.text("Waiting to hear back: " + weekJobs.filter(j => j.status === "waiting").length, 110, 70);
 
-    // All jobs this week
-    doc.setFontSize(12);
+    // Applications this week
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 30, 30);
     doc.text("Applications This Week", 15, 92);
 
     let y = 100;
-    if (weekJobs.length === 0) {
+    if (!weekJobs.length) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(120, 120, 120);
       doc.text("No applications recorded this week.", 20, y);
+      y += 16;
     } else {
-      weekJobs.forEach((j, i) => {
-        if (y > 260) { doc.addPage(); y = 20; }
+      weekJobs.forEach(j => {
+        if (y > 255) { doc.addPage(); y = 20; }
         const sc = statusConfig[j.status] || statusConfig.applied;
         doc.setFillColor(248, 248, 248);
-        doc.rect(15, y - 5, 180, 22, "F");
+        doc.rect(15, y - 5, 180, 24, "F");
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(30, 30, 30);
@@ -518,37 +537,37 @@
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         doc.setTextColor(80, 80, 80);
-        doc.text(j.role, 20, y + 11);
+        doc.text(j.role, 20, y + 12);
         doc.text("Status: " + sc.label, 120, y + 4);
-        if (j.resume && RESUMES[j.resume]) doc.text("Resume: " + RESUMES[j.resume], 120, y + 11);
-        y += 28;
+        if (j.resume && RESUMES[j.resume]) doc.text("Resume: " + RESUMES[j.resume], 120, y + 12);
+        y += 30;
       });
     }
 
     // All-time totals
-    if (y > 240) { doc.addPage(); y = 20; }
-    doc.setFontSize(12);
+    if (y > 245) { doc.addPage(); y = 20; }
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 30, 30);
     doc.text("All-Time Totals", 15, y + 10);
-    y += 18;
+    y += 16;
     doc.setFillColor(29, 158, 117);
     doc.rect(15, y, 180, 20, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.text(`Total applications: ${jobs.length}   |   Interviews: ${jobs.filter(j=>j.status==="interview").length}   |   Offers: ${jobs.filter(j=>j.status==="offer").length}`, 20, y + 13);
+    doc.text("Total: " + jobs.length + "   |   Interviews: " + jobs.filter(j=>j.status==="interview").length + "   |   Offers: " + jobs.filter(j=>j.status==="offer").length, 20, y + 13);
 
     // Footer
     doc.setTextColor(150, 150, 150);
     doc.setFontSize(9);
-    doc.text("Generated by Ken's Job Tracker • Keep up the great work, Ken! 💪", 15, 285);
+    doc.text("Generated by Ken's Job Tracker -- Keep up the great work, Ken!", 15, 285);
 
     doc.save("Ken_Job_Report_" + today.toISOString().split("T")[0] + ".pdf");
-    showToast("📄 Weekly report downloaded!");
+    showToast("Weekly report downloaded!");
   }
 
-  // ── Filters & Render ──────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────
   function setFilter(f) { filter = f; render(); }
 
   function render() {
@@ -556,7 +575,7 @@
     Object.keys(statusConfig).forEach(k => counts[k] = jobs.filter(j => j.status === k).length);
 
     document.getElementById("stats").innerHTML = `
-      <div class="stat"><div class="stat-num">${counts.all}</div><div class="stat-label">Total applied</div></div>
+      <div class="stat"><div class="stat-num">${counts.all}</div><div class="stat-label">Total Applied</div></div>
       <div class="stat"><div class="stat-num">${counts.interview}</div><div class="stat-label">Interviews</div></div>
       <div class="stat"><div class="stat-num">${counts.offer}</div><div class="stat-label">Offers</div></div>
       <div class="stat"><div class="stat-num">${counts.waiting}</div><div class="stat-label">Waiting</div></div>
@@ -580,38 +599,49 @@
       const overdue = isOverdue(j.followup) && j.status !== "offer" && j.status !== "rejected";
       const questions = prepData[j.id] || [];
       const doneCount = questions.filter(q => q.done).length;
+      const isPrepOpen = !!openPrep[j.id];
 
       return `<div class="job-card">
         <div class="job-card-top">
-          <div>
+          <div class="job-info">
             <div class="job-company">${j.company}</div>
             <div class="job-role">${j.role}</div>
             <div class="job-meta">
               <span class="badge ${sc.cls}">${sc.label}</span>
               ${j.date ? `<span class="job-date">Applied ${fmtDate(j.date)}</span>` : ""}
-              ${j.resume && RESUMES[j.resume] ? `<span class="job-resume">📄 ${RESUMES[j.resume]}</span>` : ""}
-              ${j.followup ? `<span class="job-followup${overdue ? " overdue" : ""}">🔔 Follow up ${fmtDate(j.followup)}${overdue ? " (overdue)" : ""}</span>` : ""}
+              ${j.resume && RESUMES[j.resume] ? `<span class="job-resume">Resume: ${RESUMES[j.resume]}</span>` : ""}
+              ${j.followup ? `<span class="job-followup${overdue ? " overdue" : ""}">Follow up ${fmtDate(j.followup)}${overdue ? " (overdue)" : ""}</span>` : ""}
             </div>
             ${j.notes ? `<div class="job-note">${j.notes}</div>` : ""}
           </div>
           <div class="job-actions">
-            <button class="icon-btn" title="Interview Prep" onclick="togglePrep('${j.id}')">🎯</button>
-            <button class="icon-btn" title="Edit" onclick="editJob('${j.id}')">✏️</button>
-            <button class="icon-btn" title="Delete" onclick="deleteJob('${j.id}')">🗑️</button>
+            <button class="action-btn${isPrepOpen ? " prep-active" : ""}" id="prepbtn-${j.id}" onclick="togglePrep('${j.id}')">
+              <span class="btn-icon">🎯</span>
+              <span class="btn-label">Practice</span>
+            </button>
+            <button class="action-btn" onclick="editJob('${j.id}')">
+              <span class="btn-icon">✏️</span>
+              <span class="btn-label">Edit</span>
+            </button>
+            <button class="action-btn" onclick="deleteJob('${j.id}')">
+              <span class="btn-icon">🗑️</span>
+              <span class="btn-label">Delete</span>
+            </button>
           </div>
         </div>
-        <div class="prep-panel" id="prep-${j.id}">
-          <div class="prep-title">🎯 Interview Prep — ${j.company}${questions.length ? ` (${doneCount}/${questions.length} practiced)` : ""}</div>
+        <div class="prep-panel${isPrepOpen ? " open" : ""}" id="prep-${j.id}">
+          <div class="prep-header">
+            <div class="prep-title">Interview Practice — ${j.company}</div>
+            <div class="prep-progress" id="prep-progress-${j.id}">${questions.length ? doneCount + "/" + questions.length + " practiced" : ""}</div>
+          </div>
           ${!questions.length
-            ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">✨ Generate interview questions</button>`
+            ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">Generate interview questions</button>`
             : ""}
           <div class="prep-questions" id="prep-questions-${j.id}"></div>
-          ${questions.length ? `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${j.id}')">🔄 Regenerate questions</button>` : ""}
         </div>
       </div>`;
     }).join("");
 
-    // Re-render any open prep panels
     visible.forEach(j => {
       if (prepData[j.id] && prepData[j.id].length) renderQuestions(j.id);
     });
