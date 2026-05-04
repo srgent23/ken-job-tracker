@@ -29,13 +29,19 @@
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem 1rem 3rem; }
     .container { max-width: 740px; margin: 0 auto; width: 100%; }
-
-    /* iPhone safe area support */
     @supports (padding: max(0px)) {
       body { padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); padding-bottom: max(3rem, env(safe-area-inset-bottom)); }
     }
 
-    /* HEADER */
+    /* ── TAB NAV ── */
+    .tab-nav { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 1.5px solid var(--border); }
+    .tab-btn { background: none; border: none; border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; padding: 9px 18px 10px; font-size: 14px; font-weight: 500; color: var(--text3); cursor: pointer; font-family: inherit; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--text2); }
+    .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── HEADER ── */
     .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.25rem; gap: 10px; }
     .title { font-size: 20px; font-weight: 600; }
     @media (min-width: 600px) { .title { font-size: 24px; } .header { margin-bottom: 1.5rem; } }
@@ -49,14 +55,14 @@
     .pdf-btn { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 12px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; white-space: nowrap; }
     .pdf-btn:hover { background: var(--surface2); }
 
-    /* STATS - 2x2 on phone, 4 across on laptop */
+    /* ── STATS ── */
     .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
     @media (min-width: 600px) { .stats { grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; } }
     .stat { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; }
     .stat-num { font-size: 22px; font-weight: 600; }
     .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-    /* FORM */
+    /* ── FORM ── */
     .form-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; display: none; }
     .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
     .form-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
@@ -78,12 +84,12 @@
     .btn-cancel { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 10px 16px; font-size: 15px; color: var(--text2); cursor: pointer; font-family: inherit; }
     .saving-msg { font-size: 12px; color: var(--text3); }
 
-    /* FILTERS */
+    /* ── FILTERS ── */
     .filters { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
     .filter-btn { background: transparent; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 13px; cursor: pointer; color: var(--text2); font-family: inherit; }
     .filter-btn.active { background: #E6F1FB; color: #185FA5; border-color: transparent; }
 
-    /* JOB CARDS */
+    /* ── JOB CARDS ── */
     .jobs-list { display: flex; flex-direction: column; gap: 10px; }
     .job-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
     .job-card-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
@@ -102,8 +108,6 @@
     .job-followup { font-size: 11px; color: #854F0B; background: #FAEEDA; padding: 2px 8px; border-radius: 10px; }
     .job-followup.overdue { color: #A32D2D; background: #FCEBEB; }
     .job-note { font-size: 13px; color: var(--text2); margin-top: 8px; line-height: 1.55; border-top: 0.5px solid var(--border); padding-top: 8px; }
-
-    /* ACTION BUTTONS WITH LABELS */
     .job-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
     @media (min-width: 600px) { .job-actions { flex-direction: row; align-items: flex-start; } }
     .action-btn { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; padding: 6px 8px; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 52px; }
@@ -113,7 +117,7 @@
     .action-btn.prep-active { background: #EEEDFE; border-color: #534AB7; }
     .action-btn.prep-active .btn-label { color: #534AB7; }
 
-    /* INTERVIEW PREP PANEL */
+    /* ── INTERVIEW PREP ── */
     .prep-panel { margin-top: 10px; border-top: 0.5px solid var(--border); padding-top: 10px; display: none; }
     .prep-panel.open { display: block; }
     .prep-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
@@ -131,7 +135,43 @@
     .answer-toggle:hover { text-decoration: underline; }
     .answer-box { background: #EEEDFE; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: #2d2a6e; line-height: 1.6; margin-left: 28px; }
 
-    /* MISC */
+    /* ── CHECKLIST TAB ── */
+    .cl-hero { margin-bottom: 1.5rem; }
+    .cl-greeting { font-size: 22px; font-weight: 600; color: var(--text); }
+    .cl-date { font-size: 13px; color: var(--text3); margin-top: 2px; }
+    .cl-progress-wrap { height: 8px; background: var(--surface2); border-radius: 20px; margin: 1rem 0 6px; overflow: hidden; border: 0.5px solid var(--border); }
+    .cl-progress-fill { height: 100%; background: var(--green); border-radius: 20px; transition: width 0.4s ease; }
+    .cl-progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .cl-progress-count { font-size: 13px; font-weight: 600; color: var(--text); }
+    .cl-progress-msg { font-size: 12px; color: var(--text3); }
+    .cl-streak-row { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+    .cl-streak-day { width: 34px; height: 34px; border-radius: var(--radius-md); border: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text3); gap: 1px; }
+    .cl-streak-day.today { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
+    .cl-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--text3); margin: 1.25rem 0 8px; }
+    .cl-task { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 7px; cursor: pointer; transition: border-color 0.15s, opacity 0.2s; }
+    .cl-task:hover { border-color: var(--border-strong); }
+    .cl-task.done { opacity: 0.45; }
+    .cl-task.done .cl-task-title { text-decoration: line-through; color: var(--text3); }
+    .cl-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .cl-check.checked { background: var(--green); border-color: var(--green); }
+    .cl-checkmark { width: 5px; height: 9px; border-right: 2px solid white; border-bottom: 2px solid white; transform: rotate(45deg) translate(-1px,-1px); display: none; }
+    .cl-check.checked .cl-checkmark { display: block; }
+    .cl-task-body { flex: 1; min-width: 0; }
+    .cl-task-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; line-height: 1.4; }
+    .cl-task-sub { font-size: 12px; color: var(--text3); line-height: 1.55; }
+    .cl-task-link { font-size: 12px; color: var(--green); text-decoration: none; margin-top: 4px; display: inline-block; font-weight: 500; }
+    .cl-task-link:hover { text-decoration: underline; }
+    .cl-pill { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 20px; margin-left: 6px; vertical-align: middle; font-weight: 600; white-space: nowrap; }
+    .pill-high   { background: #E1F5EE; color: #085041; }
+    .pill-med    { background: #E6F1FB; color: #0C447C; }
+    .pill-once   { background: #FAEEDA; color: #633806; }
+    .cl-all-done { text-align: center; padding: 1.75rem 1rem; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-top: 1rem; display: none; }
+    .cl-all-done-title { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .cl-all-done-sub { font-size: 13px; color: var(--text3); }
+    .cl-reset-btn { background: transparent; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px; font-size: 13px; color: var(--text3); cursor: pointer; font-family: inherit; margin-top: 1.5rem; display: block; }
+    .cl-reset-btn:hover { color: var(--text2); border-color: var(--border-strong); }
+
+    /* ── MISC ── */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { font-size: 36px; margin-bottom: 10px; }
     .loading { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
@@ -142,82 +182,312 @@
 <body>
 <div class="container">
 
-  <div class="header">
-    <div>
-      <div class="title">Ken's Job Tracker</div>
-      <div class="sync-status">
-        <div class="sync-dot" id="sync-dot"></div>
-        <span id="sync-label">Connecting...</span>
+  <!-- ── TAB NAV ── -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" id="tab-tracker-btn" onclick="switchTab('tracker')">📋 Job Tracker</button>
+    <button class="tab-btn" id="tab-checklist-btn" onclick="switchTab('checklist')">✅ Daily Checklist</button>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       TAB 1 — JOB TRACKER (original, unchanged)
+  ════════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-tracker">
+
+    <div class="header">
+      <div>
+        <div class="title">Ken's Job Tracker</div>
+        <div class="sync-status">
+          <div class="sync-dot" id="sync-dot"></div>
+          <span id="sync-label">Connecting...</span>
+        </div>
+      </div>
+      <div class="header-btns">
+        <button class="pdf-btn" onclick="exportPDF()">📄 Report</button>
+        <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
       </div>
     </div>
-    <div class="header-btns">
-      <button class="pdf-btn" onclick="exportPDF()">📄 Report</button>
-      <button class="add-btn" onclick="toggleForm()">+ Add Job</button>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="form-card" id="form-card">
+      <div class="form-title" id="form-title">New job application</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company name *</label>
+          <input type="text" id="f-company" placeholder="e.g. Best Buy" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Job title *</label>
+          <input type="text" id="f-role" placeholder="e.g. Sales Advisor" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Date applied</label>
+          <input type="date" id="f-date" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="applied">Applied</option>
+            <option value="waiting">Waiting to hear back</option>
+            <option value="interview">Interview scheduled</option>
+            <option value="offer">Got an offer!</option>
+            <option value="rejected">Not selected</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Resume used</label>
+          <select id="f-resume">
+            <option value="">-- Select resume --</option>
+            <option value="Ken_V1_Retail_Sales">V1 — Retail Sales</option>
+            <option value="Ken_V2_Warehouse_Logistics">V2 — Warehouse & Logistics</option>
+            <option value="Ken_V3_Customer_Service">V3 — Customer Service</option>
+            <option value="Ken_V4_Facilities_Maintenance">V4 — Facilities & Maintenance</option>
+            <option value="Ken_V5_FoodService_Grocery">V5 — Food Service & Grocery</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Follow-up reminder date</label>
+          <input type="date" id="f-followup" />
+        </div>
+        <div class="form-group full">
+          <label>Notes (optional)</label>
+          <textarea id="f-notes" placeholder="Contact name, next steps, anything helpful..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-save" id="btn-save" onclick="saveJob()">Save</button>
+        <button class="btn-cancel" onclick="cancelForm()">Cancel</button>
+        <span class="saving-msg" id="saving-msg"></span>
+      </div>
     </div>
-  </div>
 
-  <div class="stats" id="stats"></div>
+    <div class="filters" id="filters"></div>
+    <div class="jobs-list" id="jobs-list"><div class="loading">Connecting to database...</div></div>
 
-  <div class="form-card" id="form-card">
-    <div class="form-title" id="form-title">New job application</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Company name *</label>
-        <input type="text" id="f-company" placeholder="e.g. Best Buy" autocomplete="off" />
-      </div>
-      <div class="form-group">
-        <label>Job title *</label>
-        <input type="text" id="f-role" placeholder="e.g. Sales Advisor" autocomplete="off" />
-      </div>
-      <div class="form-group">
-        <label>Date applied</label>
-        <input type="date" id="f-date" />
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <select id="f-status">
-          <option value="applied">Applied</option>
-          <option value="waiting">Waiting to hear back</option>
-          <option value="interview">Interview scheduled</option>
-          <option value="offer">Got an offer!</option>
-          <option value="rejected">Not selected</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Resume used</label>
-        <select id="f-resume">
-          <option value="">-- Select resume --</option>
-          <option value="Ken_V1_Retail_Sales">V1 — Retail Sales</option>
-          <option value="Ken_V2_Warehouse_Logistics">V2 — Warehouse & Logistics</option>
-          <option value="Ken_V3_Customer_Service">V3 — Customer Service</option>
-          <option value="Ken_V4_Facilities_Maintenance">V4 — Facilities & Maintenance</option>
-          <option value="Ken_V5_FoodService_Grocery">V5 — Food Service & Grocery</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Follow-up reminder date</label>
-        <input type="date" id="f-followup" />
-      </div>
-      <div class="form-group full">
-        <label>Notes (optional)</label>
-        <textarea id="f-notes" placeholder="Contact name, next steps, anything helpful..."></textarea>
+  </div><!-- /tab-tracker -->
+
+  <!-- ════════════════════════════════════════════
+       TAB 2 — DAILY CHECKLIST
+  ════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-checklist">
+
+    <div class="cl-hero">
+      <div class="cl-greeting" id="cl-greeting">Good morning, Ken</div>
+      <div class="cl-date" id="cl-date"></div>
+    </div>
+
+    <div class="cl-progress-wrap">
+      <div class="cl-progress-fill" id="cl-prog-fill" style="width:0%"></div>
+    </div>
+    <div class="cl-progress-meta">
+      <div class="cl-progress-count" id="cl-prog-count">0 / 9 done</div>
+      <div class="cl-progress-msg" id="cl-prog-msg">Start at the top — those have the best odds of finding something new today.</div>
+    </div>
+
+    <div class="cl-streak-row" id="cl-streak-row"></div>
+
+    <!-- SECTION: Every day -->
+    <div class="cl-section-label">Every day — highest chance of new jobs</div>
+
+    <div class="cl-task" id="cl-t0" onclick="clToggle(0)">
+      <div class="cl-check" id="cl-c0"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check Indeed — filter "past 24 hours" <span class="cl-pill pill-high">Most listings</span></div>
+        <div class="cl-task-sub">Search: cashier OR stocker OR "customer service" — Salinas, CA. New listings appear overnight. Takes about 5 minutes.</div>
+        <a class="cl-task-link" href="https://www.indeed.com/jobs?q=cashier+stocker+%22customer+service%22&l=Salinas%2C+CA&fromage=1" onclick="event.stopPropagation()">Open Indeed →</a>
       </div>
     </div>
-    <div class="form-actions">
-      <button class="btn-save" id="btn-save" onclick="saveJob()">Save</button>
-      <button class="btn-cancel" onclick="cancelForm()">Cancel</button>
-      <span class="saving-msg" id="saving-msg"></span>
+
+    <div class="cl-task" id="cl-t1" onclick="clToggle(1)">
+      <div class="cl-check" id="cl-c1"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check Craigslist Monterey — part-time section <span class="cl-pill pill-high">Local only</span></div>
+        <div class="cl-task-sub">Small businesses post here before anywhere else. Check both "part-time" and "food/bev/hosp" sections.</div>
+        <a class="cl-task-link" href="https://monterey.craigslist.org/search/part-time-jobs" onclick="event.stopPropagation()">Open Craigslist →</a>
+      </div>
     </div>
-  </div>
 
-  <div class="filters" id="filters"></div>
-  <div class="jobs-list" id="jobs-list"><div class="loading">Connecting to database...</div></div>
+    <div class="cl-task" id="cl-t2" onclick="clToggle(2)">
+      <div class="cl-check" id="cl-c2"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check Facebook Jobs — Salinas & Monterey <span class="cl-pill pill-high">Hidden listings</span></div>
+        <div class="cl-task-sub">Family-owned stores and restaurants often post only here. Search "cashier Salinas" and "bilingual Salinas."</div>
+        <a class="cl-task-link" href="https://www.facebook.com/marketplace/salinas-ca/jobs" onclick="event.stopPropagation()">Open Facebook Jobs →</a>
+      </div>
+    </div>
 
-</div>
+    <div class="cl-task" id="cl-t3" onclick="clToggle(3)">
+      <div class="cl-check" id="cl-c3"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check ZipRecruiter — sort by date posted <span class="cl-pill pill-med">Fast to apply</span></div>
+        <div class="cl-task-sub">Good for applying quickly. Many listings have a 1-click apply. Takes about 10 minutes to scan.</div>
+        <a class="cl-task-link" href="https://www.ziprecruiter.com/Jobs/Retail/-in-Salinas,CA" onclick="event.stopPropagation()">Open ZipRecruiter →</a>
+      </div>
+    </div>
+
+    <!-- SECTION: After applying -->
+    <div class="cl-section-label">After applying — stay organized</div>
+
+    <div class="cl-task" id="cl-t4" onclick="clToggle(4)">
+      <div class="cl-check" id="cl-c4"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Log any new applications in this tracker <span class="cl-pill pill-med">Stay organized</span></div>
+        <div class="cl-task-sub">Every application goes in — company, date, which resume you used, status. Tap the Job Tracker tab to add.</div>
+      </div>
+    </div>
+
+    <!-- SECTION: 3x per week -->
+    <div class="cl-section-label">3 times per week — Monday, Wednesday, Friday</div>
+
+    <div class="cl-task" id="cl-t5" onclick="clToggle(5)">
+      <div class="cl-check" id="cl-c5"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check Salinas Chamber job board <span class="cl-pill pill-med">Local employers</span></div>
+        <div class="cl-task-sub">Local businesses post here that skip the big boards. Express Employment refreshes listings here regularly.</div>
+        <a class="cl-task-link" href="https://business.salinaschamber.com/job-board" onclick="event.stopPropagation()">Open Chamber board →</a>
+      </div>
+    </div>
+
+    <div class="cl-task" id="cl-t6" onclick="clToggle(6)">
+      <div class="cl-check" id="cl-c6"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Check r/Salinas on Reddit <span class="cl-pill pill-med">Community tips</span></div>
+        <div class="cl-task-sub">Search "hiring" in r/Salinas. Locals share job leads before they hit the boards — great for referrals too.</div>
+        <a class="cl-task-link" href="https://www.reddit.com/r/Salinas/search/?q=hiring&sort=new" onclick="event.stopPropagation()">Open Reddit →</a>
+      </div>
+    </div>
+
+    <!-- SECTION: Once per week -->
+    <div class="cl-section-label">Once per week — big moves</div>
+
+    <div class="cl-task" id="cl-t7" onclick="clToggle(7)">
+      <div class="cl-check" id="cl-c7"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Call or visit one staffing agency <span class="cl-pill pill-once">One call = many doors</span></div>
+        <div class="cl-task-sub">Rotate through: Spherion (N Main St), Express Employment, Full Steam Staffing. One registration reaches dozens of employers you'd never find on your own.</div>
+        <a class="cl-task-link" href="https://www.spherion.com/our-offices/salinas_1157/" onclick="event.stopPropagation()">Spherion Salinas →</a>
+      </div>
+    </div>
+
+    <div class="cl-task" id="cl-t8" onclick="clToggle(8)">
+      <div class="cl-check" id="cl-c8"><div class="cl-checkmark"></div></div>
+      <div class="cl-task-body">
+        <div class="cl-task-title">Walk Northridge Mall — drop off a resume in person <span class="cl-pill pill-once">Face-to-face edge</span></div>
+        <div class="cl-task-sub">Bring 3 printed resumes. At the service desk say: "Is the manager available? I'd like to drop off my resume." Ross, JCPenney, Foot Locker, GameStop, and Bath & Body Works all hire bilingual staff and respect the in-person visit.</div>
+      </div>
+    </div>
+
+    <div class="cl-all-done" id="cl-all-done">
+      <div class="cl-all-done-title">All done for today!</div>
+      <div class="cl-all-done-sub">Great work, Ken. Every step you take gets you closer. Take a break — you earned it.</div>
+    </div>
+
+    <button class="cl-reset-btn" onclick="clReset()">Reset checklist for today</button>
+
+  </div><!-- /tab-checklist -->
+
+</div><!-- /container -->
 <div class="toast" id="toast"></div>
 
 <script>
-  // ── Firebase ──────────────────────────────────────────────
+  // ── TAB SWITCHING ─────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab + '-btn').classList.add('active');
+  }
+
+  // ── CHECKLIST ─────────────────────────────────────────────
+  const CL_KEY = 'ken_checklist_v3';
+  const CL_TOTAL = 9;
+
+  const CL_MSGS = [
+    'Start at the top — those have the best odds of finding something new today.',
+    'Good start. The daily checks take about 20 minutes total.',
+    'Making progress. Every application is one more door.',
+    'Halfway through the daily checks.',
+    'More than halfway — keep going.',
+    'Almost at the daily goal.',
+    'Nearly done!',
+    'One more to go!',
+    'One more to go!',
+    'All done for today — great work!'
+  ];
+
+  function clGetState() {
+    try { return JSON.parse(localStorage.getItem(CL_KEY)) || {}; } catch(e) { return {}; }
+  }
+  function clSaveState(s) {
+    try { localStorage.setItem(CL_KEY, JSON.stringify(s)); } catch(e) {}
+  }
+
+  function clToggle(i) {
+    const s = clGetState();
+    s['t' + i] = !s['t' + i];
+    clSaveState(s);
+    clRender();
+  }
+
+  function clReset() {
+    try { localStorage.removeItem(CL_KEY); } catch(e) {}
+    clRender();
+  }
+
+  function clRender() {
+    const s = clGetState();
+    let done = 0;
+    for (let i = 0; i < CL_TOTAL; i++) {
+      const row = document.getElementById('cl-t' + i);
+      const circ = document.getElementById('cl-c' + i);
+      if (!row || !circ) continue;
+      if (s['t' + i]) {
+        done++;
+        row.classList.add('done');
+        circ.classList.add('checked');
+      } else {
+        row.classList.remove('done');
+        circ.classList.remove('checked');
+      }
+    }
+    const pct = Math.round((done / CL_TOTAL) * 100);
+    const fill = document.getElementById('cl-prog-fill');
+    const count = document.getElementById('cl-prog-count');
+    const msg = document.getElementById('cl-prog-msg');
+    const allDone = document.getElementById('cl-all-done');
+    if (fill) fill.style.width = pct + '%';
+    if (count) count.textContent = done + ' / ' + CL_TOTAL + ' done';
+    if (msg) msg.textContent = CL_MSGS[Math.min(done, CL_MSGS.length - 1)];
+    if (allDone) allDone.style.display = done === CL_TOTAL ? 'block' : 'none';
+  }
+
+  function clInitHeader() {
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const dayShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const now = new Date();
+    const h = now.getHours();
+    const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    const gEl = document.getElementById('cl-greeting');
+    const dEl = document.getElementById('cl-date');
+    if (gEl) gEl.textContent = greeting + ', Ken';
+    if (dEl) dEl.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+
+    const row = document.getElementById('cl-streak-row');
+    if (!row) return;
+    const today = now.getDay();
+    for (let i = 0; i < 7; i++) {
+      const d = document.createElement('div');
+      d.className = 'cl-streak-day' + (i === today ? ' today' : '');
+      d.innerHTML = '<span style="font-size:10px;font-weight:500;">' + dayShort[i] + '</span>';
+      row.appendChild(d);
+    }
+  }
+
+  clInitHeader();
+  clRender();
+
+  // ── FIREBASE ──────────────────────────────────────────────
   firebase.initializeApp({
     apiKey: "AIzaSyBujOjHgEY56HTCVP16YdPz7W9KkxWenN0",
     authDomain: "ken-s-job-tracker.firebaseapp.com",
@@ -229,16 +499,15 @@
   const db = firebase.firestore();
   const jobsCol = db.collection("jobs");
 
-  // ── EmailJS ───────────────────────────────────────────────
+  // ── EMAILJS ───────────────────────────────────────────────
   emailjs.init("XmyK73Pn4qFYKPKTk");
   const EMAILJS_SERVICE  = "service_3zd2p55";
   const EMAILJS_TEMPLATE = "template_dtenbe8";
   const KEN_EMAIL        = "Richardsonjr.k@gmail.com";
 
-  // ── Anthropic API key — REPLACE THIS ─────────────────────
   const PROXY_URL = "https://ken-interview-proxy.teamvoulfn.workers.dev";
 
-  // ── State ─────────────────────────────────────────────────
+  // ── STATE ─────────────────────────────────────────────────
   let jobs = [];
   let filter = "all";
   let editId = null;
@@ -257,11 +526,11 @@
     applied:   { label: "Applied",              cls: "badge-applied" },
     waiting:   { label: "Waiting to hear back", cls: "badge-waiting" },
     interview: { label: "Interview scheduled",  cls: "badge-interview" },
-    offer:     { label: "Got an offer!",        cls: "badge-offer" },
+    offer:     { label: "Got an offer!",         cls: "badge-offer" },
     rejected:  { label: "Not selected",         cls: "badge-rejected" }
   };
 
-  // ── Helpers ───────────────────────────────────────────────
+  // ── HELPERS ───────────────────────────────────────────────
   function setSyncStatus(state) {
     const dot = document.getElementById("sync-dot");
     const label = document.getElementById("sync-label");
@@ -288,7 +557,7 @@
     return new Date(dateStr) < new Date();
   }
 
-  // ── Firebase listener ─────────────────────────────────────
+  // ── FIREBASE LISTENER ─────────────────────────────────────
   jobsCol.orderBy("createdAt", "desc").onSnapshot(
     snapshot => {
       jobs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -299,26 +568,22 @@
     err => { console.error(err); setSyncStatus("error"); }
   );
 
-  // ── Follow-up reminders ───────────────────────────────────
+  // ── FOLLOW-UP REMINDERS ───────────────────────────────────
   function checkFollowUpReminders() {
     const today = new Date().toISOString().split("T")[0];
     jobs.forEach(j => {
       if (j.followup && j.followup === today && !j.reminderSent) {
         emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-          company: j.company,
-          role: j.role,
-          date: fmtDate(j.date),
-          to_email: KEN_EMAIL,
-          name: "Ken"
+          company: j.company, role: j.role, date: fmtDate(j.date), to_email: KEN_EMAIL, name: "Ken"
         }).then(() => {
           jobsCol.doc(j.id).update({ reminderSent: true });
-          showToast("Reminder email sent for " + j.company + "!");
+          showToast("Reminder sent for " + j.company + "!");
         }).catch(e => console.error("Email error:", e));
       }
     });
   }
 
-  // ── Form ──────────────────────────────────────────────────
+  // ── FORM ──────────────────────────────────────────────────
   function toggleForm() {
     editId = null;
     document.getElementById("form-title").textContent = "New job application";
@@ -344,12 +609,10 @@
     const company = document.getElementById("f-company").value.trim();
     const role = document.getElementById("f-role").value.trim();
     if (!company || !role) { alert("Please add a company name and job title."); return; }
-
     const saveBtn = document.getElementById("btn-save");
     const savingMsg = document.getElementById("saving-msg");
     saveBtn.disabled = true;
     savingMsg.textContent = "Saving...";
-
     const data = {
       company, role,
       date: document.getElementById("f-date").value,
@@ -359,7 +622,6 @@
       notes: document.getElementById("f-notes").value.trim(),
       reminderSent: false
     };
-
     try {
       if (editId) {
         await jobsCol.doc(editId).update(data);
@@ -402,12 +664,10 @@
     try {
       await jobsCol.doc(id).delete();
       showToast("Job removed.");
-    } catch(e) {
-      alert("Could not delete — check your internet connection.");
-    }
+    } catch(e) { alert("Could not delete — check your internet connection."); }
   }
 
-  // ── Interview Prep ────────────────────────────────────────
+  // ── INTERVIEW PREP ────────────────────────────────────────
   function togglePrep(id) {
     openPrep[id] = !openPrep[id];
     const panel = document.getElementById("prep-" + id);
@@ -421,43 +681,25 @@
       document.getElementById("prep-questions-" + id).innerHTML = '<div class="prep-loading">Interview prep needs setup — contact your app helper to add the API key.</div>';
       return;
     }
-
     const j = jobs.find(j => j.id === id);
     if (!j) return;
     const container = document.getElementById("prep-questions-" + id);
     container.innerHTML = '<div class="prep-loading">Generating interview questions for ' + j.company + '...</div>';
-
     try {
       const response = await fetch(PROXY_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-5",
           max_tokens: 1000,
-          messages: [{
-            role: "user",
-            content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". This person is building their interview confidence so keep questions practical and answers encouraging.
-
-Return ONLY a valid JSON array of objects with no extra text, no markdown, no code fences. Example format:
-[{"q":"Question here?","a":"Recommended answer here."}]
-
-Mix behavioral questions (Tell me about a time...) with basic role questions. For each answer, give a 2-3 sentence best-practice response using simple, confident language that Ken can adapt as his own.`
-          }]
+          messages: [{ role: "user", content: `Generate 7 interview questions for someone applying for a "${j.role}" position at "${j.company}". This person is building their interview confidence so keep questions practical and answers encouraging.\n\nReturn ONLY a valid JSON array of objects with no extra text, no markdown, no code fences. Example format:\n[{"q":"Question here?","a":"Recommended answer here."}]\n\nMix behavioral questions (Tell me about a time...) with basic role questions. For each answer, give a 2-3 sentence best-practice response using simple, confident language that Ken can adapt as his own.` }]
         })
       });
-
       const data = await response.json();
       if (!data.content || !data.content[0]) throw new Error("No response");
       const text = data.content[0].text.trim().replace(/```json|```/g, "").trim();
       const questions = JSON.parse(text);
-      prepData[id] = questions.map(q => ({
-        q: typeof q === "string" ? q : q.q,
-        a: typeof q === "string" ? null : q.a,
-        done: false,
-        showAnswer: false
-      }));
+      prepData[id] = questions.map(q => ({ q: typeof q === "string" ? q : q.q, a: typeof q === "string" ? null : q.a, done: false, showAnswer: false }));
       renderQuestions(id);
     } catch(e) {
       container.innerHTML = '<div class="prep-loading">Could not generate questions — please try again.</div>';
@@ -499,21 +741,14 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
     `).join("") + `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${id}')">Generate new questions</button>`;
   }
 
-  // ── PDF Export ────────────────────────────────────────────
+  // ── PDF EXPORT ────────────────────────────────────────────
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - 7);
-
-    const weekJobs = jobs.filter(j => {
-      if (!j.date) return false;
-      const d = new Date(j.date);
-      return d >= weekStart && d <= today;
-    });
-
-    // Header
+    const weekJobs = jobs.filter(j => { if (!j.date) return false; const d = new Date(j.date); return d >= weekStart && d <= today; });
     doc.setFillColor(29, 158, 117);
     doc.rect(0, 0, 210, 35, "F");
     doc.setTextColor(255, 255, 255);
@@ -523,8 +758,6 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
     doc.text("Weekly Report -- " + today.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }), 15, 26);
-
-    // Summary
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -538,13 +771,10 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
     doc.text("Interviews scheduled: " + weekJobs.filter(j => j.status === "interview").length, 20, 70);
     doc.text("Offers received: " + weekJobs.filter(j => j.status === "offer").length, 110, 62);
     doc.text("Waiting to hear back: " + weekJobs.filter(j => j.status === "waiting").length, 110, 70);
-
-    // Applications this week
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(30, 30, 30);
     doc.text("Applications This Week", 15, 92);
-
     let y = 100;
     if (!weekJobs.length) {
       doc.setFont("helvetica", "normal");
@@ -571,8 +801,6 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
         y += 30;
       });
     }
-
-    // All-time totals
     if (y > 245) { doc.addPage(); y = 20; }
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -585,50 +813,41 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("Total: " + jobs.length + "   |   Interviews: " + jobs.filter(j=>j.status==="interview").length + "   |   Offers: " + jobs.filter(j=>j.status==="offer").length, 20, y + 13);
-
-    // Footer
     doc.setTextColor(150, 150, 150);
     doc.setFontSize(9);
     doc.text("Generated by Ken's Job Tracker -- Keep up the great work, Ken!", 15, 285);
-
     doc.save("Ken_Job_Report_" + today.toISOString().split("T")[0] + ".pdf");
     showToast("Weekly report downloaded!");
   }
 
-  // ── Render ────────────────────────────────────────────────
+  // ── RENDER (tracker tab) ──────────────────────────────────
   function setFilter(f) { filter = f; render(); }
 
   function render() {
     const counts = { all: jobs.length };
     Object.keys(statusConfig).forEach(k => counts[k] = jobs.filter(j => j.status === k).length);
-
     document.getElementById("stats").innerHTML = `
       <div class="stat"><div class="stat-num">${counts.all}</div><div class="stat-label">Total Applied</div></div>
       <div class="stat"><div class="stat-num">${counts.interview}</div><div class="stat-label">Interviews</div></div>
       <div class="stat"><div class="stat-num">${counts.offer}</div><div class="stat-label">Offers</div></div>
       <div class="stat"><div class="stat-num">${counts.waiting}</div><div class="stat-label">Waiting</div></div>
     `;
-
     const filterLabels = { all: "All", applied: "Applied", waiting: "Waiting", interview: "Interview", offer: "Offer", rejected: "Not selected" };
     document.getElementById("filters").innerHTML = Object.entries(filterLabels).map(([k, v]) =>
       `<button class="filter-btn${filter === k ? " active" : ""}" onclick="setFilter('${k}')">${v}${k !== "all" && counts[k] ? " (" + counts[k] + ")" : ""}</button>`
     ).join("");
-
     const visible = filter === "all" ? jobs : jobs.filter(j => j.status === filter);
     const list = document.getElementById("jobs-list");
-
     if (!visible.length) {
       list.innerHTML = `<div class="empty"><div class="empty-icon">📋</div>${jobs.length ? "No jobs with this status yet." : "No applications yet — add your first one!"}</div>`;
       return;
     }
-
     list.innerHTML = visible.map(j => {
       const sc = statusConfig[j.status] || statusConfig.applied;
       const overdue = isOverdue(j.followup) && j.status !== "offer" && j.status !== "rejected";
       const questions = prepData[j.id] || [];
       const doneCount = questions.filter(q => q.done).length;
       const isPrepOpen = !!openPrep[j.id];
-
       return `<div class="job-card">
         <div class="job-card-top">
           <div class="job-info">
@@ -644,16 +863,13 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
           </div>
           <div class="job-actions">
             <button class="action-btn${isPrepOpen ? " prep-active" : ""}" id="prepbtn-${j.id}" onclick="togglePrep('${j.id}')">
-              <span class="btn-icon">🎯</span>
-              <span class="btn-label">Practice</span>
+              <span class="btn-icon">🎯</span><span class="btn-label">Practice</span>
             </button>
             <button class="action-btn" onclick="editJob('${j.id}')">
-              <span class="btn-icon">✏️</span>
-              <span class="btn-label">Edit</span>
+              <span class="btn-icon">✏️</span><span class="btn-label">Edit</span>
             </button>
             <button class="action-btn" onclick="deleteJob('${j.id}')">
-              <span class="btn-icon">🗑️</span>
-              <span class="btn-label">Delete</span>
+              <span class="btn-icon">🗑️</span><span class="btn-label">Delete</span>
             </button>
           </div>
         </div>
@@ -662,17 +878,12 @@ Mix behavioral questions (Tell me about a time...) with basic role questions. Fo
             <div class="prep-title">Interview Practice — ${j.company}</div>
             <div class="prep-progress" id="prep-progress-${j.id}">${questions.length ? doneCount + "/" + questions.length + " practiced" : ""}</div>
           </div>
-          ${!questions.length
-            ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">Generate interview questions</button>`
-            : ""}
+          ${!questions.length ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">Generate interview questions</button>` : ""}
           <div class="prep-questions" id="prep-questions-${j.id}"></div>
         </div>
       </div>`;
     }).join("");
-
-    visible.forEach(j => {
-      if (prepData[j.id] && prepData[j.id].length) renderQuestions(j.id);
-    });
+    visible.forEach(j => { if (prepData[j.id] && prepData[j.id].length) renderQuestions(j.id); });
   }
 </script>
 </body>
