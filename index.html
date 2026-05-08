@@ -103,6 +103,7 @@
     .badge-offer     { background: #EAF3DE; color: #3B6D11; }
     .badge-rejected  { background: #FCEBEB; color: #A32D2D; }
     .badge-waiting   { background: #EEEDFE; color: #534AB7; }
+    .badge-planned   { background: #F0F0EE; color: #888; }
     .job-date { font-size: 11px; color: var(--text3); }
     .job-resume { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 2px 8px; border-radius: 10px; }
     .job-followup { font-size: 11px; color: #854F0B; background: #FAEEDA; padding: 2px 8px; border-radius: 10px; }
@@ -227,6 +228,7 @@
         <div class="form-group">
           <label>Status</label>
           <select id="f-status">
+            <option value="planned">Planning to apply</option>
             <option value="applied">Applied</option>
             <option value="waiting">Waiting to hear back</option>
             <option value="interview">Interview scheduled</option>
@@ -243,6 +245,7 @@
             <option value="Ken_V3_Customer_Service">V3 — Customer Service</option>
             <option value="Ken_V4_Facilities_Maintenance">V4 — Facilities & Maintenance</option>
             <option value="Ken_V5_FoodService_Grocery">V5 — Food Service & Grocery</option>
+            <option value="none">Did not use resume</option>
           </select>
         </div>
         <div class="form-group">
@@ -519,10 +522,12 @@
     "Ken_V2_Warehouse_Logistics":   "V2 — Warehouse & Logistics",
     "Ken_V3_Customer_Service":      "V3 — Customer Service",
     "Ken_V4_Facilities_Maintenance":"V4 — Facilities & Maintenance",
-    "Ken_V5_FoodService_Grocery":   "V5 — Food Service & Grocery"
+    "Ken_V5_FoodService_Grocery":   "V5 — Food Service & Grocery",
+    "none":                         "In person – no resume"
   };
 
   const statusConfig = {
+    planned:   { label: "Planning to apply",    cls: "badge-planned" },
     applied:   { label: "Applied",              cls: "badge-applied" },
     waiting:   { label: "Waiting to hear back", cls: "badge-waiting" },
     interview: { label: "Interview scheduled",  cls: "badge-interview" },
@@ -832,7 +837,7 @@
       <div class="stat"><div class="stat-num">${counts.offer}</div><div class="stat-label">Offers</div></div>
       <div class="stat"><div class="stat-num">${counts.waiting}</div><div class="stat-label">Waiting</div></div>
     `;
-    const filterLabels = { all: "All", applied: "Applied", waiting: "Waiting", interview: "Interview", offer: "Offer", rejected: "Not selected" };
+    const filterLabels = { all: "All", planned: "Planned", applied: "Applied", waiting: "Waiting", interview: "Interview", offer: "Offer", rejected: "Not selected" };
     document.getElementById("filters").innerHTML = Object.entries(filterLabels).map(([k, v]) =>
       `<button class="filter-btn${filter === k ? " active" : ""}" onclick="setFilter('${k}')">${v}${k !== "all" && counts[k] ? " (" + counts[k] + ")" : ""}</button>`
     ).join("");
@@ -844,7 +849,7 @@
     }
     list.innerHTML = visible.map(j => {
       const sc = statusConfig[j.status] || statusConfig.applied;
-      const overdue = isOverdue(j.followup) && j.status !== "offer" && j.status !== "rejected";
+      const overdue = isOverdue(j.followup) && j.status !== "offer" && j.status !== "rejected" && j.status !== "planned";
       const questions = prepData[j.id] || [];
       const doneCount = questions.filter(q => q.done).length;
       const isPrepOpen = !!openPrep[j.id];
@@ -855,7 +860,7 @@
             <div class="job-role">${j.role}</div>
             <div class="job-meta">
               <span class="badge ${sc.cls}">${sc.label}</span>
-              ${j.date ? `<span class="job-date">Applied ${fmtDate(j.date)}</span>` : ""}
+              ${j.date ? `<span class="job-date">${j.status === "planned" ? "Target:" : "Applied"} ${fmtDate(j.date)}</span>` : ""}
               ${j.resume && RESUMES[j.resume] ? `<span class="job-resume">Resume: ${RESUMES[j.resume]}</span>` : ""}
               ${j.followup ? `<span class="job-followup${overdue ? " overdue" : ""}">Follow up ${fmtDate(j.followup)}${overdue ? " (overdue)" : ""}</span>` : ""}
             </div>
