@@ -136,6 +136,19 @@
     .answer-toggle:hover { text-decoration: underline; }
     .answer-box { background: #EEEDFE; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: #2d2a6e; line-height: 1.6; margin-left: 28px; }
 
+    /* ── FOLLOW-UP PANEL ── */
+    .followup-panel { margin-top: 10px; border-top: 0.5px solid var(--border); padding-top: 10px; display: none; }
+    .followup-panel.open { display: block; }
+    .followup-section { margin-bottom: 10px; }
+    .followup-section:last-child { margin-bottom: 0; }
+    .followup-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .followup-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.04em; }
+    .copy-btn { display: inline-flex; align-items: center; gap: 4px; background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 3px 8px; font-size: 11px; color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 500; }
+    .copy-btn:hover { background: var(--surface2); }
+    .followup-text { background: var(--surface2); border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .action-btn.followup-active { background: #E1F5EE; border-color: #1D9E75; }
+    .action-btn.followup-active .btn-label, .action-btn.followup-active .btn-icon { color: #1D9E75; }
+
     /* ── CHECKLIST TAB ── */
     .cl-hero { margin-bottom: 1.5rem; }
     .cl-greeting { font-size: 22px; font-weight: 600; color: var(--text); }
@@ -516,6 +529,8 @@
   let editId = null;
   let prepData = {};
   let openPrep = {};
+  let followupData = {};
+  let openFollowup = {};
 
   const RESUMES = {
     "Ken_V1_Retail_Sales":          "V1 — Retail Sales",
@@ -746,6 +761,85 @@
     `).join("") + `<button class="prep-btn" style="margin-top:8px;" onclick="generateQuestions('${id}')">Generate new questions</button>`;
   }
 
+  // ── FOLLOW-UP EMAIL ───────────────────────────────────────
+  function toggleFollowup(id) {
+    openFollowup[id] = !openFollowup[id];
+    const panel = document.getElementById("followup-" + id);
+    const btn   = document.getElementById("followupbtn-" + id);
+    if (panel) panel.classList.toggle("open", !!openFollowup[id]);
+    if (btn)   btn.classList.toggle("followup-active", !!openFollowup[id]);
+    if (openFollowup[id] && !followupData[id]) generateFollowup(id);
+  }
+
+  async function generateFollowup(id) {
+    if (!PROXY_URL) {
+      document.getElementById("followup-content-" + id).innerHTML = '<div class="prep-loading">Follow-up generator needs setup — contact your app helper to add the API key.</div>';
+      return;
+    }
+    const j = jobs.find(j => j.id === id);
+    if (!j) return;
+    const container = document.getElementById("followup-content-" + id);
+    container.innerHTML = '<div class="prep-loading">Writing follow-up messages for ' + j.company + '...</div>';
+    const sc = statusConfig[j.status] || statusConfig.applied;
+    const daysSince = j.date ? Math.floor((Date.now() - new Date(j.date)) / 86400000) : null;
+    const context = [
+      j.company && `Company: ${j.company}`,
+      j.role    && `Role: ${j.role}`,
+      daysSince !== null && `Applied: ${daysSince} day${daysSince !== 1 ? "s" : ""} ago`,
+      `Status: ${sc.label}`,
+      j.notes   && `Notes: ${j.notes}`
+    ].filter(Boolean).join("\n");
+    try {
+      const response = await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-5",
+          max_tokens: 800,
+          messages: [{ role: "user", content: `Write two follow-up messages for a job application using these details:\n${context}\n\nReturn ONLY a valid JSON object with no extra text, no markdown, no code fences:\n{"email":"Full email with Subject line at top, then blank line, then body. Professional, warm, brief — 3-4 sentences max. Reference the specific role and company. End with Ken's name.","text":"A short text or DM version under 300 characters. Casual but polite. No subject line needed."}\n\nFor the email: if status is interview, write a post-interview thank-you follow-up. Otherwise write a polite status-check. Always be positive and specific.` }]
+        })
+      });
+      const data = await response.json();
+      if (!data.content || !data.content[0]) throw new Error("No response");
+      const raw = data.content[0].text.trim().replace(/```json|```/g, "").trim();
+      followupData[id] = JSON.parse(raw);
+      renderFollowup(id);
+    } catch(e) {
+      container.innerHTML = '<div class="prep-loading">Could not generate messages — please try again.</div>';
+      console.error(e);
+    }
+  }
+
+  function renderFollowup(id) {
+    const container = document.getElementById("followup-content-" + id);
+    if (!container || !followupData[id]) return;
+    const { email, text } = followupData[id];
+    const copyIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+    container.innerHTML = `
+      <div class="followup-section">
+        <div class="followup-section-header">
+          <span class="followup-label">Email</span>
+          <button class="copy-btn" onclick="copyFollowup('${id}','email')">${copyIcon} Copy</button>
+        </div>
+        <div class="followup-text">${email.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+      </div>
+      <div class="followup-section">
+        <div class="followup-section-header">
+          <span class="followup-label">Text / DM</span>
+          <button class="copy-btn" onclick="copyFollowup('${id}','text')">${copyIcon} Copy</button>
+        </div>
+        <div class="followup-text">${text.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+      </div>
+      <button class="prep-btn" style="margin-top:10px;" onclick="followupData['${id}']=null;generateFollowup('${id}')">Regenerate</button>`;
+  }
+
+  function copyFollowup(id, type) {
+    const d = followupData[id];
+    if (!d) return;
+    navigator.clipboard.writeText(type === "email" ? d.email : d.text)
+      .then(() => showToast("Copied to clipboard!"));
+  }
+
   // ── PDF EXPORT ────────────────────────────────────────────
   function exportPDF() {
     const { jsPDF } = window.jspdf;
@@ -876,6 +970,9 @@
             <button class="action-btn" onclick="deleteJob('${j.id}')">
               <span class="btn-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span><span class="btn-label">Delete</span>
             </button>
+            <button class="action-btn${openFollowup[j.id] ? " followup-active" : ""}" id="followupbtn-${j.id}" onclick="toggleFollowup('${j.id}')">
+              <span class="btn-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span><span class="btn-label">Follow-up</span>
+            </button>
           </div>
         </div>
         <div class="prep-panel${isPrepOpen ? " open" : ""}" id="prep-${j.id}">
@@ -885,6 +982,12 @@
           </div>
           ${!questions.length ? `<button class="prep-btn" onclick="generateQuestions('${j.id}')">Generate interview questions</button>` : ""}
           <div class="prep-questions" id="prep-questions-${j.id}"></div>
+        </div>
+        <div class="followup-panel${openFollowup[j.id] ? " open" : ""}" id="followup-${j.id}">
+          <div class="prep-header">
+            <div class="prep-title">Follow-up Messages — ${j.company}</div>
+          </div>
+          <div id="followup-content-${j.id}"></div>
         </div>
       </div>`;
     }).join("");
