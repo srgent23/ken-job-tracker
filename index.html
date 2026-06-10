@@ -185,6 +185,35 @@
     .cl-reset-btn { background: transparent; border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 8px 16px; font-size: 13px; color: var(--text3); cursor: pointer; font-family: inherit; margin-top: 1.5rem; display: block; }
     .cl-reset-btn:hover { color: var(--text2); border-color: var(--border-strong); }
 
+    /* ── NOTES TAB ── */
+    .notes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .notes-title { font-size: 20px; font-weight: 600; }
+    @media (min-width: 600px) { .notes-title { font-size: 24px; } }
+    .note-form { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; display: none; }
+    .note-form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+    .note-form input { width: 100%; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 11px; font-size: 16px; background: var(--surface2); color: var(--text); font-family: inherit; outline: none; margin-bottom: 10px; }
+    .note-form input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+    .note-form textarea { width: 100%; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 11px; font-size: 16px; background: var(--surface2); color: var(--text); font-family: inherit; outline: none; resize: none; height: 130px; line-height: 1.6; }
+    .note-form textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+    .note-form-actions { display: flex; gap: 8px; margin-top: 1rem; align-items: center; flex-wrap: wrap; }
+    .notes-list { display: flex; flex-direction: column; gap: 10px; }
+    .note-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+    .note-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; cursor: pointer; }
+    .note-card-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.35; }
+    .note-card-date { font-size: 11px; color: var(--text3); margin-top: 3px; }
+    .note-card-preview { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .note-chevron { color: var(--text3); flex-shrink: 0; margin-top: 2px; transition: transform 0.2s; }
+    .note-chevron.open { transform: rotate(180deg); }
+    .note-edit-panel { display: none; margin-top: 10px; border-top: 0.5px solid var(--border); padding-top: 10px; }
+    .note-edit-panel.open { display: block; }
+    .note-edit-panel textarea { width: 100%; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 11px; font-size: 15px; background: var(--surface2); color: var(--text); font-family: inherit; outline: none; resize: none; height: 160px; line-height: 1.6; }
+    .note-edit-panel textarea:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+    .note-edit-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+    .btn-delete { background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 8px 14px; font-size: 13px; color: #E24B4A; cursor: pointer; font-family: inherit; margin-left: auto; }
+    .btn-delete:hover { background: #FCEBEB; }
+    .note-empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
+    .note-empty-icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.35; }
+
     /* ── MISC ── */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.35; }
@@ -200,6 +229,7 @@
   <nav class="tab-nav">
     <button class="tab-btn active" id="tab-tracker-btn" onclick="switchTab('tracker')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> Job Tracker</button>
     <button class="tab-btn" id="tab-checklist-btn" onclick="switchTab('checklist')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Daily Checklist</button>
+    <button class="tab-btn" id="tab-notes-btn" onclick="switchTab('notes')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Notes</button>
   </nav>
 
   <!-- ════════════════════════════════════════════
@@ -402,6 +432,33 @@
 
   </div><!-- /tab-checklist -->
 
+  <!-- ════════════════════════════════════════════
+       TAB 3 — NOTES
+  ════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-notes">
+
+    <div class="notes-header">
+      <div class="notes-title">Notes</div>
+      <button class="add-btn" onclick="notesToggleForm()">+ Add Note</button>
+    </div>
+
+    <div class="note-form" id="note-form">
+      <div class="note-form-title" id="note-form-title">New note</div>
+      <input type="text" id="n-title" placeholder="Title (e.g. Counselor meeting — June 10)" autocomplete="off" />
+      <textarea id="n-body" placeholder="What happened, action items, things to remember..."></textarea>
+      <div class="note-form-actions">
+        <button class="btn-save" id="n-btn-save" onclick="notesSave()">Save</button>
+        <button class="btn-cancel" onclick="notesCancelForm()">Cancel</button>
+        <span class="saving-msg" id="n-saving-msg"></span>
+      </div>
+    </div>
+
+    <div class="notes-list" id="notes-list">
+      <div class="note-empty"><div class="note-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>No notes yet — tap Add Note to get started.</div>
+    </div>
+
+  </div><!-- /tab-notes -->
+
 </div><!-- /container -->
 <div class="toast" id="toast"></div>
 
@@ -431,27 +488,25 @@
     'All done for today — great work!'
   ];
 
-  function clGetState() {
-    try { return JSON.parse(localStorage.getItem(CL_KEY)) || {}; } catch(e) { return {}; }
-  }
-  function clSaveState(s) {
-    try { localStorage.setItem(CL_KEY, JSON.stringify(s)); } catch(e) {}
-  }
+  let clState = {};
 
   function clToggle(i) {
-    const s = clGetState();
-    s['t' + i] = !s['t' + i];
-    clSaveState(s);
+    const next = !clState['t' + i];
+    clState['t' + i] = next;
     clRender();
+    checklistDoc.set({ ['t' + i]: next }, { merge: true }).catch(e => console.error(e));
   }
 
   function clReset() {
-    try { localStorage.removeItem(CL_KEY); } catch(e) {}
+    const cleared = {};
+    for (let i = 0; i < CL_TOTAL; i++) cleared['t' + i] = false;
+    clState = cleared;
     clRender();
+    checklistDoc.set(cleared).catch(e => console.error(e));
   }
 
   function clRender() {
-    const s = clGetState();
+    const s = clState;
     let done = 0;
     for (let i = 0; i < CL_TOTAL; i++) {
       const row = document.getElementById('cl-t' + i);
@@ -514,6 +569,8 @@
   });
   const db = firebase.firestore();
   const jobsCol = db.collection("jobs");
+  const checklistDoc = db.collection("checklist").doc("state");
+  const notesCol = db.collection("notes");
 
   // ── EMAILJS ───────────────────────────────────────────────
   emailjs.init("XmyK73Pn4qFYKPKTk");
@@ -587,6 +644,133 @@
     },
     err => { console.error(err); setSyncStatus("error"); }
   );
+
+  // ── CHECKLIST SYNC ────────────────────────────────────────
+  checklistDoc.onSnapshot(
+    snap => { clState = snap.exists ? snap.data() : {}; clRender(); },
+    err => console.error("Checklist sync error:", err)
+  );
+
+  // ── NOTES ─────────────────────────────────────────────────
+  let notes = [];
+  let noteEditId = null;
+
+  notesCol.orderBy("createdAt", "desc").onSnapshot(
+    snap => { notes = snap.docs.map(d => ({ id: d.id, ...d.data() })); notesRender(); },
+    err => console.error("Notes sync error:", err)
+  );
+
+  function notesToggleForm() {
+    noteEditId = null;
+    document.getElementById("note-form-title").textContent = "New note";
+    document.getElementById("n-title").value = "";
+    document.getElementById("n-body").value = "";
+    document.getElementById("n-saving-msg").textContent = "";
+    const form = document.getElementById("note-form");
+    const showing = form.style.display === "block";
+    form.style.display = showing ? "none" : "block";
+    if (!showing) setTimeout(() => document.getElementById("n-title").focus(), 100);
+  }
+
+  function notesCancelForm() {
+    document.getElementById("note-form").style.display = "none";
+  }
+
+  async function notesSave() {
+    const title = document.getElementById("n-title").value.trim();
+    const body = document.getElementById("n-body").value.trim();
+    if (!title) { document.getElementById("n-title").focus(); return; }
+    const btn = document.getElementById("n-btn-save");
+    const msg = document.getElementById("n-saving-msg");
+    btn.disabled = true; msg.textContent = "Saving...";
+    try {
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      if (noteEditId) {
+        await notesCol.doc(noteEditId).update({ title, body, updatedAt: now });
+      } else {
+        await notesCol.add({ title, body, createdAt: now, updatedAt: now });
+      }
+      document.getElementById("note-form").style.display = "none";
+      noteEditId = null;
+      showToast("Note saved!");
+    } catch(e) {
+      msg.textContent = "Could not save.";
+      console.error(e);
+    }
+    btn.disabled = false;
+  }
+
+  async function notesDelete(id) {
+    if (!confirm("Delete this note?")) return;
+    try { await notesCol.doc(id).delete(); showToast("Note deleted."); }
+    catch(e) { alert("Could not delete."); }
+  }
+
+  function notesToggleEdit(id) {
+    const panel = document.getElementById("nep-" + id);
+    const chevron = document.getElementById("nch-" + id);
+    if (!panel) return;
+    const opening = !panel.classList.contains("open");
+    document.querySelectorAll(".note-edit-panel.open").forEach(p => {
+      p.classList.remove("open");
+      const ch = document.getElementById("nch-" + p.dataset.noteId);
+      if (ch) ch.classList.remove("open");
+    });
+    if (opening) {
+      panel.classList.add("open");
+      if (chevron) chevron.classList.add("open");
+      const note = notes.find(n => n.id === id);
+      if (note) document.getElementById("nta-" + id).value = note.body || "";
+    }
+  }
+
+  async function notesUpdateBody(id) {
+    const body = document.getElementById("nta-" + id).value.trim();
+    const btn = document.getElementById("nsave-" + id);
+    btn.disabled = true;
+    try {
+      await notesCol.doc(id).update({ body, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      showToast("Note saved!");
+    } catch(e) { alert("Could not save."); }
+    btn.disabled = false;
+  }
+
+  function fmtNoteDate(ts) {
+    if (!ts) return "";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  }
+
+  function notesRender() {
+    const list = document.getElementById("notes-list");
+    if (!list) return;
+    if (!notes.length) {
+      list.innerHTML = '<div class="note-empty"><div class="note-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>No notes yet — tap Add Note to get started.</div>';
+      return;
+    }
+    list.innerHTML = notes.map(n => {
+      const preview = (n.body || "").replace(/\n/g, " ").slice(0, 120);
+      return `<div class="note-card">
+        <div class="note-card-top" onclick="notesToggleEdit('${n.id}')">
+          <div>
+            <div class="note-card-title">${n.title || "Untitled"}</div>
+            <div class="note-card-date">${fmtNoteDate(n.createdAt)}</div>
+            ${preview ? `<div class="note-card-preview">${preview}</div>` : ""}
+          </div>
+          <svg class="note-chevron" id="nch-${n.id}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="note-edit-panel" id="nep-${n.id}" data-note-id="${n.id}">
+          <textarea id="nta-${n.id}" placeholder="Write your notes here..."></textarea>
+          <div class="note-edit-actions">
+            <button class="btn-save" id="nsave-${n.id}" onclick="notesUpdateBody('${n.id}')">Save</button>
+            <button class="btn-cancel" onclick="notesToggleEdit('${n.id}')">Close</button>
+            <button class="btn-delete" onclick="notesDelete('${n.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
 
   // ── FOLLOW-UP REMINDERS ───────────────────────────────────
   function checkFollowUpReminders() {
