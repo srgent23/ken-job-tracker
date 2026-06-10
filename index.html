@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
@@ -214,6 +215,36 @@
     .note-empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .note-empty-icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.35; }
 
+    /* ── RESUMES TAB ── */
+    .resumes-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .resumes-title { font-size: 20px; font-weight: 600; }
+    @media (min-width: 600px) { .resumes-title { font-size: 24px; } }
+    .resume-form { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.25rem; display: none; }
+    .resume-form-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
+    .resume-form input[type="text"] { width: 100%; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 9px 11px; font-size: 16px; background: var(--surface2); color: var(--text); font-family: inherit; outline: none; margin-bottom: 10px; }
+    .resume-form input[type="text"]:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(29,158,117,0.15); }
+    .resume-form input[type="file"] { width: 100%; border: 0.5px solid var(--border-strong); border-radius: var(--radius-md); padding: 8px 11px; font-size: 14px; background: var(--surface2); color: var(--text); font-family: inherit; margin-bottom: 10px; cursor: pointer; }
+    .r-progress-wrap { height: 6px; background: var(--surface2); border-radius: 20px; margin-bottom: 10px; overflow: hidden; border: 0.5px solid var(--border); display: none; }
+    .r-progress-fill { height: 100%; background: var(--green); border-radius: 20px; transition: width 0.2s ease; width: 0%; }
+    .resume-form-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .resumes-list { display: flex; flex-direction: column; gap: 10px; }
+    .resume-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .resume-card-left { display: flex; gap: 12px; align-items: flex-start; flex: 1; min-width: 0; }
+    .resume-card-info { flex: 1; min-width: 0; }
+    .resume-card-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .resume-card-desc { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .resume-card-date { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    .resume-card-actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; align-items: flex-start; }
+    .resume-btn { border-radius: var(--radius-md); padding: 7px 13px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; border: 0.5px solid var(--border-strong); }
+    .resume-btn.view { background: #E6F1FB; color: #185FA5; border-color: transparent; }
+    .resume-btn.view:hover { background: #cfe3f7; }
+    .resume-btn.dl { background: var(--surface2); color: var(--text2); }
+    .resume-btn.dl:hover { background: var(--border); }
+    .resume-btn.del { background: transparent; color: #E24B4A; }
+    .resume-btn.del:hover { background: #FCEBEB; }
+    .resume-empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
+    .resume-empty-icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.35; }
+
     /* ── MISC ── */
     .empty { text-align: center; padding: 3rem 1rem; color: var(--text3); font-size: 14px; }
     .empty-icon { display: flex; justify-content: center; margin-bottom: 12px; opacity: 0.35; }
@@ -230,6 +261,7 @@
     <button class="tab-btn active" id="tab-tracker-btn" onclick="switchTab('tracker')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> Job Tracker</button>
     <button class="tab-btn" id="tab-checklist-btn" onclick="switchTab('checklist')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Daily Checklist</button>
     <button class="tab-btn" id="tab-notes-btn" onclick="switchTab('notes')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Notes</button>
+    <button class="tab-btn" id="tab-resumes-btn" onclick="switchTab('resumes')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> Resumes</button>
   </nav>
 
   <!-- ════════════════════════════════════════════
@@ -459,6 +491,37 @@
 
   </div><!-- /tab-notes -->
 
+  <!-- ════════════════════════════════════════════
+       TAB 4 — RESUMES
+  ════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-resumes">
+
+    <div class="resumes-header">
+      <div class="resumes-title">Resumes</div>
+      <button class="add-btn" onclick="resumesToggleForm()">+ Upload Resume</button>
+    </div>
+
+    <div class="resume-form" id="resume-form">
+      <div class="resume-form-title">Upload a resume</div>
+      <input type="text" id="r-name" placeholder="Display name (e.g. V1 — Retail Sales)" autocomplete="off" />
+      <input type="text" id="r-desc" placeholder="Description (optional — e.g. For retail & customer service jobs)" autocomplete="off" />
+      <input type="file" id="r-file" accept=".pdf,application/pdf" />
+      <div class="r-progress-wrap" id="r-progress-wrap">
+        <div class="r-progress-fill" id="r-progress-fill"></div>
+      </div>
+      <div class="resume-form-actions">
+        <button class="btn-save" id="r-btn-upload" onclick="resumesUpload()">Upload</button>
+        <button class="btn-cancel" onclick="resumesCancelForm()">Cancel</button>
+        <span class="saving-msg" id="r-saving-msg"></span>
+      </div>
+    </div>
+
+    <div class="resumes-list" id="resumes-list">
+      <div class="resume-empty"><div class="resume-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>No resumes uploaded yet — tap Upload Resume to add one.</div>
+    </div>
+
+  </div><!-- /tab-resumes -->
+
 </div><!-- /container -->
 <div class="toast" id="toast"></div>
 
@@ -568,9 +631,11 @@
     appId: "1:897303567106:web:85b38f0fbe5f2813a7c01b"
   });
   const db = firebase.firestore();
+  const storage = firebase.storage();
   const jobsCol = db.collection("jobs");
   const checklistDoc = db.collection("checklist").doc("state");
   const notesCol = db.collection("notes");
+  const resumesCol = db.collection("resumeFiles");
 
   // ── EMAILJS ───────────────────────────────────────────────
   emailjs.init("XmyK73Pn4qFYKPKTk");
@@ -770,6 +835,145 @@
         </div>
       </div>`;
     }).join("");
+  }
+
+  // ── RESUMES ───────────────────────────────────────────────
+  let resumeFiles = [];
+
+  resumesCol.orderBy("uploadedAt", "desc").onSnapshot(
+    snap => { resumeFiles = snap.docs.map(d => ({ id: d.id, ...d.data() })); resumesRender(); },
+    err => console.error("Resumes sync error:", err)
+  );
+
+  function resumesToggleForm() {
+    const form = document.getElementById("resume-form");
+    const showing = form.style.display === "block";
+    if (!showing) {
+      document.getElementById("r-name").value = "";
+      document.getElementById("r-desc").value = "";
+      document.getElementById("r-file").value = "";
+      document.getElementById("r-saving-msg").textContent = "";
+      document.getElementById("r-progress-wrap").style.display = "none";
+      document.getElementById("r-progress-fill").style.width = "0%";
+    }
+    form.style.display = showing ? "none" : "block";
+    if (!showing) setTimeout(() => document.getElementById("r-name").focus(), 100);
+  }
+
+  function resumesCancelForm() {
+    document.getElementById("resume-form").style.display = "none";
+  }
+
+  function resumesUpload() {
+    const name = document.getElementById("r-name").value.trim();
+    const desc = document.getElementById("r-desc").value.trim();
+    const fileInput = document.getElementById("r-file");
+    const file = fileInput.files[0];
+    if (!name) { document.getElementById("r-name").focus(); return; }
+    if (!file) { showToast("Please select a PDF file."); return; }
+    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
+      showToast("Only PDF files are supported."); return;
+    }
+    const btn = document.getElementById("r-btn-upload");
+    const msg = document.getElementById("r-saving-msg");
+    const progressWrap = document.getElementById("r-progress-wrap");
+    const progressFill = document.getElementById("r-progress-fill");
+    btn.disabled = true;
+    msg.textContent = "Uploading...";
+    progressWrap.style.display = "block";
+    progressFill.style.width = "0%";
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const storagePath = "resumes/" + Date.now() + "_" + safeName;
+    const uploadTask = storage.ref(storagePath).put(file);
+    uploadTask.on("state_changed",
+      snapshot => {
+        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        progressFill.style.width = pct + "%";
+      },
+      err => {
+        console.error(err);
+        msg.textContent = "Upload failed — check your connection.";
+        btn.disabled = false;
+      },
+      () => {
+        resumesCol.add({
+          name, description: desc, storagePath, fileName: file.name,
+          uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          document.getElementById("resume-form").style.display = "none";
+          showToast("Resume uploaded!");
+        }).catch(e => {
+          console.error(e);
+          msg.textContent = "Uploaded but could not save info.";
+        });
+        btn.disabled = false;
+      }
+    );
+  }
+
+  async function resumesView(id) {
+    const r = resumeFiles.find(f => f.id === id);
+    if (!r) return;
+    try {
+      const url = await storage.ref(r.storagePath).getDownloadURL();
+      window.open(url, "_blank");
+    } catch(e) { showToast("Could not open file."); }
+  }
+
+  async function resumesDownload(id) {
+    const r = resumeFiles.find(f => f.id === id);
+    if (!r) return;
+    try {
+      const url = await storage.ref(r.storagePath).getDownloadURL();
+      const a = document.createElement("a");
+      a.href = url + "&response-content-disposition=attachment";
+      a.download = r.fileName || r.name + ".pdf";
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch(e) { showToast("Could not download file."); }
+  }
+
+  async function resumesDelete(id) {
+    if (!confirm("Delete this resume? This cannot be undone.")) return;
+    const r = resumeFiles.find(f => f.id === id);
+    if (!r) return;
+    try { await storage.ref(r.storagePath).delete(); } catch(e) { console.warn("Storage delete:", e.message); }
+    try { await resumesCol.doc(id).delete(); showToast("Resume deleted."); }
+    catch(e) { alert("Could not delete."); }
+  }
+
+  function fmtUploadDate(ts) {
+    if (!ts) return "";
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+  }
+
+  function resumesRender() {
+    const list = document.getElementById("resumes-list");
+    if (!list) return;
+    if (!resumeFiles.length) {
+      list.innerHTML = '<div class="resume-empty"><div class="resume-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>No resumes uploaded yet — tap Upload Resume to add one.</div>';
+      return;
+    }
+    list.innerHTML = resumeFiles.map(r => `
+      <div class="resume-card">
+        <div class="resume-card-left">
+          <svg width="28" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0;margin-top:2px"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div class="resume-card-info">
+            <div class="resume-card-name">${r.name}</div>
+            ${r.description ? `<div class="resume-card-desc">${r.description}</div>` : ""}
+            <div class="resume-card-date">${r.fileName || ""}${r.uploadedAt ? " · Uploaded " + fmtUploadDate(r.uploadedAt) : ""}</div>
+          </div>
+        </div>
+        <div class="resume-card-actions">
+          <button class="resume-btn view" onclick="resumesView('${r.id}')">View</button>
+          <button class="resume-btn dl" onclick="resumesDownload('${r.id}')">Download</button>
+          <button class="resume-btn del" onclick="resumesDelete('${r.id}')">Delete</button>
+        </div>
+      </div>`).join("");
   }
 
   // ── FOLLOW-UP REMINDERS ───────────────────────────────────
