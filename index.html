@@ -915,10 +915,11 @@
   async function resumesView(id) {
     const r = resumeFiles.find(f => f.id === id);
     if (!r) return;
+    const win = window.open("", "_blank");
     try {
       const url = await storage.ref(r.storagePath).getDownloadURL();
-      window.open(url, "_blank");
-    } catch(e) { showToast("Could not open file."); }
+      win.location.href = url;
+    } catch(e) { win.close(); showToast("Could not open file."); }
   }
 
   async function resumesDownload(id) {
