@@ -35,7 +35,8 @@
     }
 
     /* ── TAB NAV ── */
-    .tab-nav { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 1.5px solid var(--border); }
+    .tab-nav { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 1.5px solid var(--border); overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+    .tab-nav::-webkit-scrollbar { display: none; }
     .tab-btn { background: none; border: none; border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; padding: 9px 18px 10px; font-size: 14px; font-weight: 500; color: var(--text3); cursor: pointer; font-family: inherit; transition: color 0.15s, border-color 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
     .tab-btn:hover { color: var(--text2); }
     .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
